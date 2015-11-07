@@ -3,7 +3,7 @@ package projet.samp.quizz;
 import java.util.ArrayList;
 
 public class Quizz {
-    ArrayList<Question> questionList;
+    public ArrayList<Question> questionList;
     String quizzName;
 
     public String getQuizzName() {
@@ -11,11 +11,12 @@ public class Quizz {
     }
 
     public Quizz(String quizzName) {
-        this.quizzName = null;
+        questionList = new ArrayList<>();
         this.quizzName = quizzName;
     }
 
     public void setQuizzName(String quizzName) {
+        this.quizzName = quizzName;
     }
 
     public ArrayList<Question> getQuestionList() {

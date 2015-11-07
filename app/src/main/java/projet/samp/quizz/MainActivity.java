@@ -16,6 +16,7 @@ package projet.samp.quizz;
 
         import java.net.URL;
         import java.util.ArrayList;
+        import java.util.Iterator;
 
         import javax.xml.parsers.DocumentBuilder;
         import javax.xml.parsers.DocumentBuilderFactory;
@@ -106,32 +107,56 @@ public class MainActivity extends AppCompatActivity {
 
                     Element quizzs = (Element) racineNoeuds.item(i);
 
+                    /* On creer un nouveau Quizz et on l'insere dans notre liste quizz */
                     quizzsList.add(new Quizz(quizzs.getAttribute("type")));
+
                     NodeList questions = quizzs.getElementsByTagName("Question");
                     int nbQuestionsElements = questions.getLength();
-                    ArrayList<Question> questionsList = new ArrayList<>();
 
                     for (int j = 0; j < nbQuestionsElements; j++) {
+
                         Element question = (Element) questions.item(j);
-                        questionsList.add(new Question(question.getFirstChild().getNodeValue()));
+
+                        /* On creer une nouvelle Question et on l'insere dans la liste de questions du quizz courant */
+                        quizzsList.get(indice).questionList.add(new Question(question.getFirstChild().getNodeValue().replaceAll("\\t", "").replaceAll("\\n", "")));
+
                         NodeList propositions = question.getElementsByTagName("Propositions");
                         int nbPropositionsElements = propositions.getLength();
 
-                        ArrayList<Proposition> propositionsList = new ArrayList<>();
 
                         for (int k = 0; k < nbPropositionsElements; k++) {
-                            propositionsList.add(new Proposition(propositions.item(k).getTextContent()));
+                            /* On creer une nouvelle proposition et on l'insere dans la liste de proposition de la question courante du quizz courant */
+                            quizzsList.get(indice).questionList.get(j).propositionsList.add(new Proposition(propositions.item(k).getTextContent().replaceAll("\\t", "").replaceAll("\\n", "")));
                         }
 
-                        quizzsList.get(indice).questionList.get(j).setPropositionsList(propositionsList);
                         Element indiceReponse = (Element) question.getElementsByTagName("Reponse").item(0);
+                        /* On indique l'indice de la proposition vrai dans la question courante du quizz courant */
                         quizzsList.get(indice).questionList.get(j).setIndiceReponce(new Integer(indiceReponse.getAttribute("valeur")).intValue());
-                        indice++;
                     }
-                    quizzsList.get(indice).setQuestionList(questionsList);
+
+                    indice++;
                 }
             }
-           pDialog.dismiss();
+            pDialog.dismiss();
+
+            /*for (int i = 0 ; i < quizzsList.size(); i++) {
+
+                System.out.println(quizzsList.get(i).getQuizzName());
+
+                for (int j = 0 ; j < quizzsList.get(i).questionList.size(); j++) {
+
+                    System.out.println(quizzsList.get(i).questionList.get(j).getQuestion());
+
+                    for (int k = 0 ; k < quizzsList.get(i).questionList.get(j).propositionsList.size(); k++) {
+
+                        System.out.println(quizzsList.get(i).questionList.get(j).propositionsList.get(k).getProposition());
+
+                    }
+
+                    System.out.println(quizzsList.get(i).questionList.get(j).getIndiceReponce());
+                }
+            }*/
+
         }
     }
 
