@@ -24,7 +24,7 @@ package projet.samp.quizz;
 public class MainActivity extends AppCompatActivity {
 
     String URL = "http://raphaello.univ-fcomte.fr/m1/Quizzs.xml";
-    ArrayList<Quizz> quizzsList = new ArrayList<>();
+    static ArrayList<Quizz> quizzsList = new ArrayList<>();
     ProgressDialog pDialog;
     NodeList racine;
 
@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         boutonJouer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, QuizzActivity.class);
+                Intent intent = new Intent(MainActivity.this, SelectQuizzActivity.class);
+                intent.putExtra("STATE", "play");
                 startActivity(intent);
             }
         });

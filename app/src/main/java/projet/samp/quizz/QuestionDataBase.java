@@ -8,7 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.List;
 
 public class QuestionDataBase extends SQLiteOpenHelper {
-    private static final String DATABASE_CREATE = "create table questions (_id integer primary key autoincrement, question text not null, reponse text not null) ;";
+    private static final String DATABASE_CREATE_TABLE_QUIZZ = "create table quizz (id_quizz integer primary key autoincrement, quizzName text not null);";
+    private static final String DATABASE_CREATE_TABLE_QUESTION = "create table question (id_question integer primary key autoincrement, texteQuestion text not null, id_quizz integer not null, id_reponse integer not null);";
+    private static final String DATABASE_CREATE_TABLE_PROPOSITION = "create table proposition (id_proposition integer primary key autoincrement, texteProposition text not null, id_question integer not null);";
+
     private static final String DATABASE_NAME = "questions.db";
     private static final int DATABASE_VERSION = 1;
     SQLiteDatabase db;
@@ -17,37 +20,77 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public Cursor getCursor() {
+    public Cursor getCursorForQuestion() {
         this.db = getWritableDatabase();
-        return this.db.rawQuery("SELECT * FROM questions", null);
+        return this.db.rawQuery("SELECT * FROM question", null);
     }
+
+    public Cursor getCursorForQuizz() {
+        this.db = getWritableDatabase();
+        return this.db.rawQuery("SELECT * FROM quizz", null);
+    }
+
+    public Cursor getCursorForProposition() {
+        this.db = getWritableDatabase();
+        return this.db.rawQuery("SELECT * FROM proposition", null);
+    }
+
 
     public void onCreate(SQLiteDatabase database) {
         this.db = database;
-        database.execSQL(DATABASE_CREATE);
-        this.db.execSQL("INSERT INTO questions (question, reponse) VALUES ('Le diable de Tasmanie vit dans la jungle du Br\u00e9sil.', 'faux')");
-        this.db.execSQL("INSERT INTO questions (question, reponse) VALUES ('La sauterelle saute l \u00e9quivalent de 200 fois sa taille.', 'vrai')");
-        this.db.execSQL("INSERT INTO questions (question, reponse) VALUES ('Les pandas hibernent.', 'faux')");
-        this.db.execSQL("INSERT INTO questions (question, reponse) VALUES ('On trouve des dromadaires en libert\u00e9 en Australie.', 'vrai')");
-        this.db.execSQL("INSERT INTO questions (question, reponse) VALUES ('Le papillon monarque vole plus de 4000km.', 'vrai')");
-        this.db.execSQL("INSERT INTO questions (question, reponse) VALUES ('Les gorilles m\u00e2les dorment dans les arbres.', 'faux')");
+        database.execSQL(DATABASE_CREATE_TABLE_QUIZZ);
+        database.execSQL(DATABASE_CREATE_TABLE_QUESTION);
+        database.execSQL(DATABASE_CREATE_TABLE_PROPOSITION);
+
+        for (int i = 0 ; i < MainActivity.quizzsList.size(); i++) {
+
+
+            String quizzName = MainActivity.quizzsList.get(i).getQuizzName();
+            ContentValues values = new ContentValues(2);
+            values.put("id_quizz", i);
+            values.put("quizzName", quizzName);
+            database.insert("quizz", null, values);
+
+            for (int j = 0 ; j < MainActivity.quizzsList.get(i).questionList.size(); j++) {
+
+                String texteQuestion = MainActivity.quizzsList.get(i).questionList.get(j).getQuestion();
+                int indiceReponse = MainActivity.quizzsList.get(i).questionList.get(j).getIndiceReponce();
+                ContentValues values2 = new ContentValues(4);
+                values2.put("id_question", j);
+                values2.put("texteQuestion", texteQuestion);
+                values2.put("id_quizz", i);
+                values2.put("id_reponse", indiceReponse);
+                database.insert("question", null, values2);
+
+                for (int k = 0 ; k < MainActivity.quizzsList.get(i).questionList.get(j).propositionsList.size(); k++) {
+
+                    String texteProposition = MainActivity.quizzsList.get(i).questionList.get(j).propositionsList.get(k).getProposition();
+                    ContentValues values3 = new ContentValues(3);
+                    values3.put("id_proposition", k);
+                    values3.put("texteProposition", texteProposition);
+                    values3.put("id_question", j);
+                    database.insert("proposition", null, values3);
+
+                }
+            }
+        }
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
     public void chargerLesQuestions(List<String> lcs) {
-        Cursor cursor = getCursor();
+        Cursor cursor = getCursorForQuestion();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            lcs.add(cursor.getString(DATABASE_VERSION));
+            lcs.add(cursor.getString(1));
             cursor.moveToNext();
         }
         cursor.close();
     }
 
     public void chargerLesReponses(List<String> lcs) {
-        Cursor cursor = getCursor();
+        Cursor cursor = getCursorForQuestion();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             lcs.add(cursor.getString(2));
@@ -64,8 +107,18 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     }
 
     public boolean supprimeQuestion(String question) {
-        String[] strArr = new String[DATABASE_VERSION];
+        String[] strArr = new String[1];
         strArr[0] = question;
         return this.db.delete("questions", " question = ?", strArr) > 0;
+    }
+
+    public void chargerLesQuizz(List<String> mesQuizz) {
+        Cursor cursor = getCursorForQuizz();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            mesQuizz.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+        cursor.close();
     }
 }
