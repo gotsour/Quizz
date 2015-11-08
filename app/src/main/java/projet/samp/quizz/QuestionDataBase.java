@@ -20,9 +20,9 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public Cursor getCursorForQuestion() {
+    public Cursor getCursorForQuestion(int quizzNumber) {
         this.db = getWritableDatabase();
-        return this.db.rawQuery("SELECT * FROM question", null);
+        return this.db.rawQuery("SELECT id_question, texteQuestion FROM question WHERE id_quizz="+quizzNumber, null);
     }
 
     public Cursor getCursorForQuizz() {
@@ -30,9 +30,9 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return this.db.rawQuery("SELECT * FROM quizz", null);
     }
 
-    public Cursor getCursorForProposition() {
+    public Cursor getCursorForProposition(int questionNumber) {
         this.db = getWritableDatabase();
-        return this.db.rawQuery("SELECT * FROM proposition", null);
+        return this.db.rawQuery("SELECT * FROM proposition where id_question="+questionNumber, null);
     }
 
 
@@ -42,8 +42,22 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         database.execSQL(DATABASE_CREATE_TABLE_QUESTION);
         database.execSQL(DATABASE_CREATE_TABLE_PROPOSITION);
 
-        for (int i = 0 ; i < MainActivity.quizzsList.size(); i++) {
+        database.execSQL("INSERT INTO quizz VALUES (1, 'Quizz 1')");
+        database.execSQL("INSERT INTO quizz VALUES (2, 'Quizz 2')");
+        database.execSQL("INSERT INTO question VALUES (1, 'Question 11', 1, 3)");
+        database.execSQL("INSERT INTO question VALUES (2, 'Question 12', 1, 2)");
+        database.execSQL("INSERT INTO question VALUES (3, 'Question 21', 2, 1)");
+        database.execSQL("INSERT INTO proposition VALUES (1, 'Proposition 11', 1)");
+        database.execSQL("INSERT INTO proposition VALUES (2, 'Proposition 12', 1)");
+        database.execSQL("INSERT INTO proposition VALUES (3, 'Proposition 13', 1)");
+        database.execSQL("INSERT INTO proposition VALUES (4, 'Proposition 14', 1)");
+        database.execSQL("INSERT INTO proposition VALUES (5, 'Proposition 21', 2)");
+        database.execSQL("INSERT INTO proposition VALUES (6, 'Proposition 22', 2)");
+        database.execSQL("INSERT INTO proposition VALUES (7, 'Proposition 23', 2)");
 
+
+
+        /*for (int i = 0 ; i < MainActivity.quizzsList.size(); i++) {
 
             String quizzName = MainActivity.quizzsList.get(i).getQuizzName();
             ContentValues values = new ContentValues(2);
@@ -73,14 +87,28 @@ public class QuestionDataBase extends SQLiteOpenHelper {
 
                 }
             }
-        }
+        }*/
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public void chargerLesQuestions(List<String> lcs) {
-        Cursor cursor = getCursorForQuestion();
+    /** Méthode qui permet de charger les questions d'un quizz donné */
+    public void chargerLesQuestions(List<String> lcs, int quizzNumber) {
+        Cursor cursor = getCursorForQuestion(quizzNumber);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            //J'ajoute successivement l'id de la question et sont texte
+            lcs.add(cursor.getString(0));
+            lcs.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+        cursor.close();
+    }
+
+    /** Méthode qui permet de charger les propositions d'une question donnée */
+    public void chargerLesReponses(List<String> lcs, int questionNumber) {
+        Cursor cursor = getCursorForProposition(questionNumber);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             lcs.add(cursor.getString(1));
@@ -89,15 +117,15 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public void chargerLesReponses(List<String> lcs) {
-        Cursor cursor = getCursorForQuestion();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            lcs.add(cursor.getString(2));
-            cursor.moveToNext();
-        }
-        cursor.close();
+    /** Méthode qui permet de récupérer l'indice de reponse de la question */
+    public int getIndiceReponse(int questionNumber) {
+        this.db = getWritableDatabase();
+        Cursor cursor = this.db.rawQuery("SELECT id_reponse FROM question WHERE id_question="+questionNumber, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        return Integer.parseInt(cursor.getString(0));
     }
+
 
     public void insertQuestion(String question, String reponse) {
         ContentValues values = new ContentValues(2);

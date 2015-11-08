@@ -2,6 +2,7 @@ package projet.samp.quizz;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,14 +41,17 @@ public class ShowQuestionsActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_questions);
 
+        Intent intent = getIntent();
+        final int quizzNumber = intent.getIntExtra("quizzNumber", 0);
+
         editQuestion = (EditText) findViewById(R.id.editTextQuestion);
         buttonVrai = (RadioButton) findViewById(R.id.radioButtonVrai);
         buttonFaux = (RadioButton) findViewById(R.id.radioButtonFaux);
         buttonAjouter = (Button) findViewById(R.id.buttonAdd);
 
         questionDB = new QuestionDataBase(this);
-        questionDB.chargerLesQuestions(mesQuestions);
-        questionDB.chargerLesReponses(mesReponses);
+        questionDB.chargerLesQuestions(mesQuestions, quizzNumber);
+        //questionDB.chargerLesReponses(mesReponses);
 
         /* Prevent Keyboard to pop up automatically */
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);

@@ -43,7 +43,7 @@ public class SelectQuizzActivity extends MainActivity {
                 TextView text1 = (TextView) view.findViewById(android.R.id.text1);
                 TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
-                text1.setText(mesQuizz.get(position));
+                text1.setText(position+1+"");
                 text2.setText(mesQuizz.get(position));
                 return view;
             }
@@ -59,14 +59,14 @@ public class SelectQuizzActivity extends MainActivity {
 
                 if (action.equals("play")) {
                     // On ouvre le quizz en question et on joue
-                    Intent intent = new Intent(SelectQuizzActivity.this, SelectQuizzActivity.class);
-                    intent.putExtra("quizzNumber", "POUR LINSTANT JE SAIS PAS ENCORE !!!");
+                    Intent intent = new Intent(SelectQuizzActivity.this, QuizzActivity.class);
+                    intent.putExtra("quizzNumber", position+1);
                     startActivity(intent);
 
                 } else if (action.equals("edit")) {
                     // On ouvre le quizz en question pour le parametrer
                     Intent intent = new Intent(SelectQuizzActivity.this, ShowQuestionsActivity.class);
-                    intent.putExtra("quizzNumber", "POUR LINSTANT JE SAIS PAS ENCORE !!!");
+                    intent.putExtra("quizzNumber", position+1);
                     startActivity(intent);
 
                 }

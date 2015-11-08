@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         boutonParametrer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ShowQuestionsActivity.class);
+                Intent intent = new Intent(MainActivity.this, SelectQuizzActivity.class);
+                intent.putExtra("STATE", "edit");
                 startActivity(intent);
             }
         });

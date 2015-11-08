@@ -5,49 +5,62 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Vrai"
-        android:id="@+id/buttonVrai"
-        android:layout_centerVertical="true"
-        android:layout_toStartOf="@+id/buttonNext" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/linearLayout">
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Faux"
-        android:id="@+id/buttonFaux"
-        android:layout_alignTop="@+id/buttonVrai"
-        android:layout_toEndOf="@+id/buttonNext" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/textViewQuestion"
+            android:layout_marginBottom="40dp"
+            android:layout_centerVertical="true"
+            android:layout_alignEnd="@+id/buttonNext" />
+    </LinearLayout>
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Next"
-        android:id="@+id/buttonNext"
-        android:layout_below="@+id/buttonVrai"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout4">
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Voir réponse"
-        android:id="@+id/buttonVoirReponse"
-        android:layout_below="@+id/buttonNext"
-        android:layout_centerHorizontal="true" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Voir réponse"
+            android:id="@+id/buttonVoirReponse"
+            android:layout_alignParentBottom="true"
+            android:layout_alignEnd="@+id/buttonNext"
+            android:layout_marginBottom="60dp"
+            android:layout_gravity="center_horizontal" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/textViewQuestion"
-        android:layout_marginBottom="40dp"
-        android:layout_above="@+id/buttonVrai"
-        android:layout_centerHorizontal="true" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:id="@+id/buttonNext"
+            android:layout_alignTop="@+id/buttonVoirReponse"
+            android:layout_alignEnd="@+id/linearLayout3"
+            android:layout_marginEnd="72dp"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/linearLayout4"
+        android:id="@+id/layoutReponse"></LinearLayout>
 
 </RelativeLayout>

@@ -1,13 +1,11 @@
 package projet.samp.quizz;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +19,8 @@ public class QuizzActivity extends MainActivity {
 
     List<String> mesQuestions = new ArrayList<String>();
     List<String> mesReponses = new ArrayList<String>();
-    ArrayAdapter<String> adapter;
     QuestionDataBase questionDB ;
+    int indiceReponse;
 
     TextView question;
     int indiceQuestion;
@@ -34,83 +32,36 @@ public class QuizzActivity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+        final int quizzNumber = intent.getIntExtra("quizzNumber", 0);
+
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
         indiceQuestion = settings.getInt("myIndice", 0);
-
-
         setContentView(R.layout.quizz);
 
+        /* On sélectionne les questions et les réponses qui correspondent au quizz passé en paramètre (quizzNumber) */
         questionDB = new QuestionDataBase(this);
-        questionDB.chargerLesQuestions(mesQuestions);
-        questionDB.chargerLesReponses(mesReponses);
+        questionDB.chargerLesQuestions(mesQuestions, quizzNumber);
 
-        Button buttonVrai = (Button) findViewById(R.id.buttonVrai);
-        Button buttonFaux = (Button) findViewById(R.id.buttonFaux);
         Button buttonNext = (Button) findViewById(R.id.buttonNext);
         Button buttonVoirReponse = (Button) findViewById(R.id.buttonVoirReponse);
 
-
-        question = (TextView) findViewById(R.id.textViewQuestion);
-        question.setText(mesQuestions.get(indiceQuestion));
-
-
-        buttonVrai.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                if (verifieReponse("vrai", indiceQuestion) == true) {
-                    if (estAlleVoirReponse) {
-                        Toast.makeText(getApplicationContext(), "Vous avez déjà consulté la réponse !", Toast.LENGTH_SHORT).show();
-                        estAlleVoirReponse = false;
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Correct !", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Mauvaise Réponse !", Toast.LENGTH_SHORT).show();
-                }
-
-                if (indiceQuestion >= mesQuestions.size()-1) {
-                    question.setText(mesQuestions.get(0));
-                    indiceQuestion = 0;
-                } else {
-                    indiceQuestion++;
-                    question.setText(mesQuestions.get(indiceQuestion));
-                }
-            }
-        });
-
-        buttonFaux.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                if (verifieReponse("faux", indiceQuestion) == true) {
-                    if (estAlleVoirReponse) {
-                        Toast.makeText(getApplicationContext(), "Vous avez déjà consulté la réponse !", Toast.LENGTH_SHORT).show();
-                        estAlleVoirReponse = false;
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Correct !", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Mauvaise Réponse !", Toast.LENGTH_SHORT).show();
-                }
-
-                if (indiceQuestion >= mesQuestions.size()-1) {
-                    question.setText(mesQuestions.get(0));
-                    indiceQuestion = 0;
-                } else {
-                    indiceQuestion++;
-                    question.setText(mesQuestions.get(indiceQuestion));
-                }
-            }
-        });
+        /**
+         * LIGNE JUSTE EN DESSOUS A ENLEVER PLUS TARD
+         */
+        indiceQuestion = 1;
+        joue(indiceQuestion - 1);
 
         buttonNext.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (indiceQuestion >= mesQuestions.size()-1) {
-                    question.setText(mesQuestions.get(0));
-                    indiceQuestion = 0;
+                indiceQuestion+=2;
+                if (indiceQuestion > mesQuestions.size()) {
+
+                    /* Le quizz est terminé, affichage du score */
+
                 } else {
-                    indiceQuestion++;
-                    question.setText(mesQuestions.get(indiceQuestion));
+                    joue(indiceQuestion-1);
                 }
             }
         });
@@ -118,7 +69,7 @@ public class QuizzActivity extends MainActivity {
         buttonVoirReponse.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(QuizzActivity.this, ShowAnswerActivity.class);
-                intent.putExtra("reponse", mesReponses.get(indiceQuestion));
+                intent.putExtra("reponse", mesReponses.get(indiceReponse - 1));
                 startActivity(intent);
                 estAlleVoirReponse = true;
             }
@@ -126,9 +77,58 @@ public class QuizzActivity extends MainActivity {
 
     }
 
-    private boolean verifieReponse(String reponse, int indiceQuestion) {
+    /* Méthode qui affiche les question et charge les élements */
+    public void joue(int indice) {
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layoutReponse);
+
+        mesReponses = new ArrayList<String>();
+
+        questionDB.chargerLesReponses(mesReponses, Integer.parseInt(mesQuestions.get(indice)));
+
+        indiceReponse = questionDB.getIndiceReponse(Integer.parseInt(mesQuestions.get(indice)));
+        layout.removeAllViews();
+
+        question = (TextView) findViewById(R.id.textViewQuestion);
+        question.setText(mesQuestions.get(indice+1));
+
+        for (int i = 0 ; i < mesReponses.size() ; i++) {
+            final Button btnTag = new Button(this);
+            btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            btnTag.setText(mesReponses.get(i));
+            btnTag.setId(i);
+            layout.addView(btnTag);
+            btnTag.setOnClickListener(myhandler1);
+        }
+
+    }
+
+    View.OnClickListener myhandler1 = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (verifieReponse(v.getId() + 1, indiceReponse) == true) {
+                if (estAlleVoirReponse) {
+                    Toast.makeText(QuizzActivity.this, "VOUS AVEZ TRICHÉ !", Toast.LENGTH_SHORT).show();
+                    estAlleVoirReponse = false;
+                } else {
+                    Toast.makeText(QuizzActivity.this, "CORRECT !", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(QuizzActivity.this, "MAUVAISE REPONSE !", Toast.LENGTH_SHORT).show();
+            }
+            indiceQuestion+=2;
+            if (indiceQuestion > mesQuestions.size()) {
+
+                    /* Le quizz est terminé, affichage du score */
+
+            } else {
+                joue(indiceQuestion-1);
+            }
+        }
+    };
+
+    private boolean verifieReponse(int idButton, int indiceReponse) {
         boolean result;
-        if ( mesReponses.get(indiceQuestion).equals(reponse)) {
+        if ( idButton == indiceReponse) {
             result = true;
         } else {
             result = false;
