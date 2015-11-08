@@ -67,7 +67,7 @@ public class ShowQuestionsActivity extends MainActivity {
                 TextView text2 = (TextView) view.findViewById(android.R.id.text2);
 
                 text1.setText(mesQuestions.get(position));
-                text2.setText(mesReponses.get(position));
+                //text2.setText(mesReponses.get(position));
                 return view;
             }
         };
