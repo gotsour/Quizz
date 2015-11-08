@@ -23,8 +23,11 @@ public class QuizzActivity extends MainActivity {
     int indiceReponse;
 
     TextView question;
+    TextView score;
     int indiceQuestion;
     boolean estAlleVoirReponse;
+
+    private int scoreJeu = 0;
 
     public static final String MyPREFERENCES = "MyPrefs" ;
 
@@ -46,6 +49,9 @@ public class QuizzActivity extends MainActivity {
 
         Button buttonNext = (Button) findViewById(R.id.buttonNext);
         Button buttonVoirReponse = (Button) findViewById(R.id.buttonVoirReponse);
+
+        score = (TextView) findViewById(R.id.textViewScore);
+        score.setText(String.valueOf(scoreJeu));
 
         /**
          * LIGNE JUSTE EN DESSOUS A ENLEVER PLUS TARD
@@ -108,12 +114,18 @@ public class QuizzActivity extends MainActivity {
             if (verifieReponse(v.getId() + 1, indiceReponse) == true) {
                 if (estAlleVoirReponse) {
                     Toast.makeText(QuizzActivity.this, "VOUS AVEZ TRICHÉ !", Toast.LENGTH_SHORT).show();
+                    scoreJeu--;
+                    score.setText(String.valueOf(scoreJeu));
                     estAlleVoirReponse = false;
                 } else {
                     Toast.makeText(QuizzActivity.this, "CORRECT !", Toast.LENGTH_SHORT).show();
+                    scoreJeu+=2;
+                    score.setText(String.valueOf(scoreJeu));
                 }
             } else {
                 Toast.makeText(QuizzActivity.this, "MAUVAISE REPONSE !", Toast.LENGTH_SHORT).show();
+                scoreJeu-=2;
+                score.setText(String.valueOf(scoreJeu));
             }
             indiceQuestion+=2;
             if (indiceQuestion > mesQuestions.size()) {
@@ -145,7 +157,6 @@ public class QuizzActivity extends MainActivity {
         SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt("myIndice", indiceQuestion);
-        System.out.println(indiceQuestion);
         // Commit the edits!
         editor.commit();
     }
