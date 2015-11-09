@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -44,33 +45,18 @@ public class ShowQuestionsActivity extends MainActivity {
         Intent intent = getIntent();
         final int quizzNumber = intent.getIntExtra("quizzNumber", 0);
 
-        editQuestion = (EditText) findViewById(R.id.editTextQuestion);
-        buttonVrai = (RadioButton) findViewById(R.id.radioButtonVrai);
-        buttonFaux = (RadioButton) findViewById(R.id.radioButtonFaux);
         buttonAjouter = (Button) findViewById(R.id.buttonAdd);
 
         questionDB = new QuestionDataBase(this);
-        questionDB.chargerLesQuestions(mesQuestions, quizzNumber);
-        //questionDB.chargerLesReponses(mesReponses);
+        questionDB.chargerLesQuestionsSansId(mesQuestions, quizzNumber);
 
         /* Prevent Keyboard to pop up automatically */
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         final ListView vueQuestions = (ListView) findViewById(R.id.expandableListViewQuestion);
 
-        /* Adapter qui permet de charger la listview avec la qestion et la reponse en subItem */
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_2, android.R.id.text1, mesQuestions) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
-                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
-
-                text1.setText(mesQuestions.get(position));
-                //text2.setText(mesReponses.get(position));
-                return view;
-            }
-        };
+        /* Adapter qui permet de charger la listview avec la qestion */
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mesQuestions);
 
         /* On applique l'adapter a la listView */
         vueQuestions.setAdapter(adapter);
@@ -78,87 +64,78 @@ public class ShowQuestionsActivity extends MainActivity {
         /* Si on clique sur le bouton Ajouter */
         buttonAjouter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String question = editQuestion.getText().toString();
+                // get prompts.xml view
+                LayoutInflater li = LayoutInflater.from(ShowQuestionsActivity.this);
+                View promptsView = li.inflate(R.layout.nouvelle_question, null);
 
-                /* On parcourt la liste des questions pour vérifier que les strings ne soient pas
-                identiques et donc pour ne pas avoir d'erreurs lors de la suppression
-                 */
-                boolean existeDeja = false;
-                for (int i = 0; i < mesQuestions.size(); i++) {
-                    if (mesQuestions.get(i).equals(question)) {
-                        existeDeja = true;
-                    }
-                }
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowQuestionsActivity.this);
 
-                if (!existeDeja) {
-                    mesQuestions.add(question);
-                    String reponse = "faux";
-                    if (buttonVrai.isChecked()) {
-                        reponse = "vrai";
-                    } else if (buttonFaux.isChecked()) {
-                        reponse = "faux";
-                    }
-                    /* On ajoute la réponse a la suite de la liste de réponse */
-                    mesReponses.add(reponse);
-                    /* On insert le couple question/reponse dans la BDD */
-                    //questionDB.insertQuestion(question, reponse);
-                    /* On indique a l'adapter que notre liste a été modifié ce qui a pour but de la réactualiser */
-                    adapter.notifyDataSetChanged();
-                    /* On remet le barre d'édition de texte a vide */
-                    editQuestion.setText("");
-                    Toast.makeText(ShowQuestionsActivity.this, "Question ajoutée !", Toast.LENGTH_SHORT).show();
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
 
-                    /* Hide keyboard after button press */
-                    InputMethodManager inputManager = (InputMethodManager) getSystemService(ShowQuestionsActivity.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                final EditText questionTexte = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
+                final EditText propositionTexte1 = (EditText) promptsView.findViewById(R.id.editTextProposition1);
+                final EditText propositionTexte2 = (EditText) promptsView.findViewById(R.id.editTextProposition2);
+                final EditText propositionTexte3 = (EditText) promptsView.findViewById(R.id.editTextProposition3);
+                final EditText propositionTexte4 = (EditText) promptsView.findViewById(R.id.editTextProposition4);
+                final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);
 
-                } else {
-                    Toast.makeText(ShowQuestionsActivity.this, "Cette question existe déjà !", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                // set dialog message
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
 
-        /* Si on clique sur l'item de la ListView */
-        vueQuestions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                        QuestionDataBase dataBase = new QuestionDataBase(ShowQuestionsActivity.this);
+                                        int nextQuestionId = database.getNextId("question");
+                                        if (!questionTexte.getText().toString().equals("")) {
+                                            dataBase.creerQuestion(nextQuestionId, questionTexte.getText().toString(), quizzNumber, Integer.parseInt(indiceReponse.getText().toString()));
+                                            mesQuestions.add(questionTexte.getText().toString());
+                                        }
+                                        int nextPropositionId = dataBase.getNextId("proposition");
+                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            mesReponses.add(propositionTexte1.getText().toString());
+                                        }
+                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                            nextPropositionId++;
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            mesReponses.add(propositionTexte2.getText().toString());
+                                        }
+                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                            nextPropositionId++;
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            mesReponses.add(propositionTexte3.getText().toString());
+                                        }
+                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                            nextPropositionId++;
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            mesReponses.add(propositionTexte4.getText().toString());
+                                        }
 
-                final TextView text = (TextView) view.findViewById(android.R.id.text1);
-
-                /* Boite de dialog pour la confirmation de suppression */
-                new AlertDialog.Builder(ShowQuestionsActivity.this)
-                        .setTitle("Confirmer")
-                        .setMessage("Voulez-vous vraiment supprimer cette question ?")
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                            public void onClick(DialogInterface dialog, int whichButton) {
-
-                                /* On récupère le texte de l'item selectionné */
-                                String question = text.getText().toString();
-
-                                int position;
-                                /* On parcourt la liste des question pour matcher avec le texte de l'item selectionné*/
-                                for (int i = 0; i < mesQuestions.size(); i++) {
-                                    if (mesQuestions.get(i).equals(question)) {
-                                        position = i;
-                                        /* Si c'est le cas on supprime la question et la réponse des deux listes */
-                                        mesQuestions.remove(position);
-                                        mesReponses.remove(position);
-                                        /* On supprimer alors le couple question/reponse correspondant */
-                                        questionDB.supprimeQuestion(question);
-                                        /* On indique a l'adapter que notre liste a été modifié ce qui a pour but de la réactualiser */
                                         adapter.notifyDataSetChanged();
-                                        Toast.makeText(ShowQuestionsActivity.this, "Question supprimée !", Toast.LENGTH_SHORT).show();
+
                                     }
                                 }
 
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null).show();
+                        )
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                }
+                        );
 
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
             }
         });
+
 
     }
 }

@@ -64,13 +64,25 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    /** Méthode qui permet de charger les questions d'un quizz donné */
+    /** Méthode qui permet de charger les questions d'un quizz donné avec l'id de la question */
     public void chargerLesQuestions(List<String> lcs, int quizzNumber) {
         Cursor cursor = getCursorForQuestion(quizzNumber);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             //J'ajoute successivement l'id de la question et sont texte
             lcs.add(cursor.getString(0));
+            lcs.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+        cursor.close();
+    }
+
+    /** Méthode qui permet de charger les questions d'un quizz donné */
+    public void chargerLesQuestionsSansId(List<String> lcs, int quizzNumber) {
+        Cursor cursor = getCursorForQuestion(quizzNumber);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            //J'ajoute successivement l'id de la question et sont texte
             lcs.add(cursor.getString(1));
             cursor.moveToNext();
         }
