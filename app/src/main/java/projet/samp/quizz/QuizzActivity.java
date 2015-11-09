@@ -100,8 +100,8 @@ public class QuizzActivity extends MainActivity {
         for (int i = 0 ; i < mesReponses.size() ; i++) {
             final Button btnTag = new Button(this);
             btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            btnTag.setText(mesReponses.get(i));
             btnTag.setId(i);
+            btnTag.setText(mesReponses.get(i));
             layout.addView(btnTag);
             btnTag.setOnClickListener(myhandler1);
         }

@@ -101,7 +101,7 @@ public class ShowQuestionsActivity extends MainActivity {
                     /* On ajoute la réponse a la suite de la liste de réponse */
                     mesReponses.add(reponse);
                     /* On insert le couple question/reponse dans la BDD */
-                    questionDB.insertQuestion(question, reponse);
+                    //questionDB.insertQuestion(question, reponse);
                     /* On indique a l'adapter que notre liste a été modifié ce qui a pour but de la réactualiser */
                     adapter.notifyDataSetChanged();
                     /* On remet le barre d'édition de texte a vide */

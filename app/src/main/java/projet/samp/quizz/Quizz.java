@@ -26,4 +26,5 @@ public class Quizz {
     public void setQuestionList(ArrayList<Question> questionList) {
         this.questionList = questionList;
     }
+
 }
