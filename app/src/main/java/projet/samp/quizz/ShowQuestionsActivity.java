@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +79,7 @@ public class ShowQuestionsActivity extends MainActivity {
                 final EditText propositionTexte2 = (EditText) promptsView.findViewById(R.id.editTextProposition2);
                 final EditText propositionTexte3 = (EditText) promptsView.findViewById(R.id.editTextProposition3);
                 final EditText propositionTexte4 = (EditText) promptsView.findViewById(R.id.editTextProposition4);
-                final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);
+                final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);;
 
                 // set dialog message
                 alertDialogBuilder
@@ -87,30 +88,38 @@ public class ShowQuestionsActivity extends MainActivity {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
 
+                                        /**
+                                         * IL FAUT ENCORE VEVRIFIER QUE LE NOMBRE PROPOSITION >= 2
+                                         * ET QUE LE NUMERO DE REPONSE EST COMPRIS ENTRE 1 ET NOMBRE PROPOSITION
+                                         */
+
                                         QuestionDataBase dataBase = new QuestionDataBase(ShowQuestionsActivity.this);
                                         int nextQuestionId = database.getNextId("question");
                                         if (!questionTexte.getText().toString().equals("")) {
-                                            dataBase.creerQuestion(nextQuestionId, questionTexte.getText().toString(), quizzNumber, Integer.parseInt(indiceReponse.getText().toString()));
-                                            mesQuestions.add(questionTexte.getText().toString());
+                                            if (!indiceReponse.getText().toString().equals("")) {
+                                                dataBase.creerQuestion(nextQuestionId, questionTexte.getText().toString(), quizzNumber, Integer.parseInt(indiceReponse.getText().toString()));
+                                                mesQuestions.add(questionTexte.getText().toString());
+                                            }
                                         }
+
                                         int nextPropositionId = dataBase.getNextId("proposition");
                                         if (!propositionTexte1.getText().toString().equals("")) {
                                             dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
                                             mesReponses.add(propositionTexte1.getText().toString());
                                         }
-                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                        if (!propositionTexte2.getText().toString().equals("")) {
                                             nextPropositionId++;
-                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte2.getText().toString(), nextQuestionId);
                                             mesReponses.add(propositionTexte2.getText().toString());
                                         }
-                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                        if (!propositionTexte3.getText().toString().equals("")) {
                                             nextPropositionId++;
-                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte3.getText().toString(), nextQuestionId);
                                             mesReponses.add(propositionTexte3.getText().toString());
                                         }
-                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                        if (!propositionTexte4.getText().toString().equals("")) {
                                             nextPropositionId++;
-                                            dataBase.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), nextQuestionId);
+                                            dataBase.creerProposition(nextPropositionId, propositionTexte4.getText().toString(), nextQuestionId);
                                             mesReponses.add(propositionTexte4.getText().toString());
                                         }
 
@@ -130,7 +139,6 @@ public class ShowQuestionsActivity extends MainActivity {
 
                 // create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
-
                 // show it
                 alertDialog.show();
             }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,13 @@ public class QuizzActivity extends MainActivity {
     TextView score;
     int indiceQuestion;
     boolean estAlleVoirReponse;
+    LinearLayout layoutProposition;
+    LinearLayout layoutQuestion;
+    LinearLayout layoutButton;
+    Button buttonNext;
+    Button buttonVoirReponse;
+    int quizzNumber;
+
 
     private int scoreJeu = 0;
 
@@ -36,7 +44,7 @@ public class QuizzActivity extends MainActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        final int quizzNumber = intent.getIntExtra("quizzNumber", 0);
+        quizzNumber = intent.getIntExtra("quizzNumber", 0);
 
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
@@ -47,8 +55,11 @@ public class QuizzActivity extends MainActivity {
         questionDB = new QuestionDataBase(this);
         questionDB.chargerLesQuestions(mesQuestions, quizzNumber);
 
-        Button buttonNext = (Button) findViewById(R.id.buttonNext);
-        Button buttonVoirReponse = (Button) findViewById(R.id.buttonVoirReponse);
+        buttonNext = (Button) findViewById(R.id.buttonNext);
+        buttonVoirReponse = (Button) findViewById(R.id.buttonVoirReponse);
+        layoutProposition = (LinearLayout) findViewById(R.id.linearLayoutReponse);
+        layoutButton = (LinearLayout) findViewById(R.id.linearLayoutButton);
+        layoutQuestion = (LinearLayout) findViewById(R.id.linearLayoutQuestion);
 
         score = (TextView) findViewById(R.id.textViewScore);
         score.setText(String.valueOf(scoreJeu));
@@ -59,40 +70,20 @@ public class QuizzActivity extends MainActivity {
         indiceQuestion = 1;
         joue(indiceQuestion - 1);
 
-        buttonNext.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                indiceQuestion+=2;
-                if (indiceQuestion > mesQuestions.size()) {
-
-                    /* Le quizz est terminé, affichage du score */
-
-                } else {
-                    joue(indiceQuestion-1);
-                }
-            }
-        });
-
-        buttonVoirReponse.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(QuizzActivity.this, ShowAnswerActivity.class);
-                intent.putExtra("reponse", mesReponses.get(indiceReponse - 1));
-                startActivity(intent);
-                estAlleVoirReponse = true;
-            }
-        });
+        buttonNext.setOnClickListener(myhandlerButtonNext);
+        buttonVoirReponse.setOnClickListener(myhandlerButtonVoirReponse);
 
     }
 
     /* Méthode qui affiche les question et charge les élements */
     public void joue(int indice) {
-        LinearLayout layout = (LinearLayout) findViewById(R.id.layoutReponse);
 
         mesReponses = new ArrayList<String>();
 
         questionDB.chargerLesReponses(mesReponses, Integer.parseInt(mesQuestions.get(indice)));
 
         indiceReponse = questionDB.getIndiceReponse(Integer.parseInt(mesQuestions.get(indice)));
-        layout.removeAllViews();
+        layoutProposition.removeAllViews();
 
         question = (TextView) findViewById(R.id.textViewQuestion);
         question.setText(mesQuestions.get(indice+1));
@@ -102,11 +93,35 @@ public class QuizzActivity extends MainActivity {
             btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             btnTag.setId(i);
             btnTag.setText(mesReponses.get(i));
-            layout.addView(btnTag);
+            layoutProposition.addView(btnTag);
             btnTag.setOnClickListener(myhandler1);
         }
 
     }
+
+    View.OnClickListener myhandlerButtonNext = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            indiceQuestion+=2;
+            if (indiceQuestion > mesQuestions.size()) {
+
+                finQuizz();
+
+            } else {
+                joue(indiceQuestion-1);
+            }
+        }
+    };
+
+    View.OnClickListener myhandlerButtonVoirReponse = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(QuizzActivity.this, ShowAnswerActivity.class);
+            intent.putExtra("reponse", mesReponses.get(indiceReponse - 1));
+            startActivity(intent);
+            estAlleVoirReponse = true;
+        }
+    };
 
     View.OnClickListener myhandler1 = new View.OnClickListener() {
         @Override
@@ -130,13 +145,54 @@ public class QuizzActivity extends MainActivity {
             indiceQuestion+=2;
             if (indiceQuestion > mesQuestions.size()) {
 
-                    /* Le quizz est terminé, affichage du score */
+                finQuizz();
 
             } else {
                 joue(indiceQuestion-1);
             }
         }
     };
+
+    public void finQuizz() {
+
+        layoutQuestion.removeAllViews();
+        layoutButton.removeAllViews();
+        layoutProposition.removeAllViews();
+
+        final Button btnRejouer = new Button(this);
+        final Button btnRetourQuizz = new Button(this);
+        final TextView scoreFinQuizz = new TextView(this);
+
+        btnRejouer.setText("Rejouer");
+        btnRetourQuizz.setText("Retour aux quizzs");
+        scoreFinQuizz.setText("Vous avez un score de : " + scoreJeu);
+
+        btnRejouer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        btnRetourQuizz.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        scoreFinQuizz.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        layoutProposition.addView(btnRejouer);
+        layoutProposition.addView(btnRetourQuizz);
+        layoutProposition.addView(scoreFinQuizz);
+
+        btnRejouer.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = getIntent();
+                finish();
+                intent.putExtra("quizzNumber", quizzNumber);
+                startActivity(intent);
+            }
+        });
+
+        btnRetourQuizz.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(QuizzActivity.this, SelectQuizzActivity.class);
+                intent.putExtra("STATE", "play");
+                startActivity(intent);
+            }
+        });
+
+    }
 
     private boolean verifieReponse(int idButton, int indiceReponse) {
         boolean result;
