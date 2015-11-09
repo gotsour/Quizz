@@ -113,6 +113,15 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public int getNextId(String tableName) {
+        String countQuery = "SELECT  * FROM " + tableName;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int cnt = cursor.getCount();
+        cursor.close();
+        return cnt+1;
+    }
+
     public long creerQuizz(int id_quizz, String quizzName) {
         this.db = getWritableDatabase();
         ContentValues values = new ContentValues();
