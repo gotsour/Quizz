@@ -1,35 +1,22 @@
 package projet.samp.quizz;
 
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.*;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity {
 
     String URL = "https://dept-info.univ-fcomte.fr/joomla/images/CR0700/Quizzs.xml";
     QuestionDataBase database;
     static ArrayList<Quizz> quizzsList = new ArrayList<>();
-    DownloadXML xml;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,21 +47,28 @@ public class MainActivity extends AppCompatActivity {
 
         boutonTelecharger.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                xml = new DownloadXML();
-                xml.execute(URL);
-                Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
-                /**
-                 * Trouvez le moyen de faire les deux instructions suivantes seulement après etre sur que execute
-                 * est terminé et a réussi
-                 */
-                quizzsList = xml.getQuizzsList();
-                insereBDD(quizzsList);
-
+                download();
             }
         });
 
+    }
 
+    public void download() {
+        DownloadXML xml = (DownloadXML) new DownloadXML().execute(URL);
+        ArrayList<Quizz> quizzsList = new ArrayList<>();
+        try {
+            quizzsList = xml.get();
+            Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {
+            Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
 
+        } catch (ExecutionException e) {
+            Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+
+        insereBDD(quizzsList);
     }
 
     public void insereBDD(ArrayList<Quizz> quizzsList) {

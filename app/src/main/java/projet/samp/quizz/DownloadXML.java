@@ -16,18 +16,11 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-class DownloadXML extends AsyncTask<String, Void, Void> {
+class DownloadXML extends AsyncTask<String, Void, ArrayList<Quizz>> {
 
-    ProgressDialog pDialog;
     NodeList racine;
 
-    public static ArrayList<Quizz> getQuizzsList() {
-        return quizzsList;
-    }
-
-    static ArrayList<Quizz> quizzsList = new ArrayList<>();
-
-    protected Void doInBackground(String... Url) {
+    protected ArrayList<Quizz> doInBackground(String... Url) {
         try {
             URL url = new URL(Url[0]);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -38,6 +31,8 @@ class DownloadXML extends AsyncTask<String, Void, Void> {
             // Locate the Tag Name
             racine = doc.getElementsByTagName("Quizzs");
 
+            return populate();
+
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
@@ -45,7 +40,8 @@ class DownloadXML extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-    protected void onPostExecute(Void args) {
+    public ArrayList<Quizz> populate() {
+        ArrayList<Quizz> quizzsList = new ArrayList<>();
         int indice = 0;
 
         NodeList racineNoeuds = racine.item(0).getChildNodes();
@@ -85,5 +81,11 @@ class DownloadXML extends AsyncTask<String, Void, Void> {
                 indice++;
             }
         }
+        return quizzsList;
+    }
+
+
+    protected void onPostExecute(Void args) {
+
     }
 }
