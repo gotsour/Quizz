@@ -1,6 +1,7 @@
 package projet.samp.quizz;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.*;
@@ -17,11 +18,17 @@ public class MainActivity extends AppCompatActivity {
     String URL = "https://dept-info.univ-fcomte.fr/joomla/images/CR0700/Quizzs.xml";
     QuestionDataBase database;
     static ArrayList<Quizz> quizzsList = new ArrayList<>();
+    public static final String MyPREFERENCES = "MyPrefs";
+    public boolean alreadyDownloaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
+        alreadyDownloaded = settings.getBoolean("myIndice", false);
 
         database = new QuestionDataBase(this);
 
@@ -54,21 +61,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void download() {
-        DownloadXML xml = (DownloadXML) new DownloadXML().execute(URL);
-        ArrayList<Quizz> quizzsList = new ArrayList<>();
-        try {
-            quizzsList = xml.get();
-            Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
-        } catch (InterruptedException e) {
-            Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+        if (!alreadyDownloaded) {
+            DownloadXML xml = (DownloadXML) new DownloadXML().execute(URL);
+            ArrayList<Quizz> quizzsList = new ArrayList<>();
+            try {
+                quizzsList = xml.get();
+                Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
+            } catch (InterruptedException e) {
+                Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
 
-        } catch (ExecutionException e) {
-            Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            } catch (ExecutionException e) {
+                Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+            insereBDD(quizzsList);
+            alreadyDownloaded = true;
+        } else {
+            Toast.makeText(MainActivity.this, "Vous avez déjà téléchargé les quizz !", Toast.LENGTH_SHORT).show();
         }
-
-        insereBDD(quizzsList);
     }
 
     public void insereBDD(ArrayList<Quizz> quizzsList) {
@@ -122,5 +133,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        //Pour sauver le boolean qui permet de savoir si download a déjà été cliqué
+        SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("myIndice", alreadyDownloaded);
+        editor.commit();
     }
 }
