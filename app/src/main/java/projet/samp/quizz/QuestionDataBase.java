@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class QuestionDataBase extends SQLiteOpenHelper {
@@ -64,7 +66,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    /** Méthode qui permet de charger les questions d'un quizz donné avec l'id de la question */
+    /** Méthode qui permet de charger les questions id + texte d'un quizz donné avec l'id de la question */
     public void chargerLesQuestions(List<String> lcs, int quizzNumber) {
         Cursor cursor = getCursorForQuestion(quizzNumber);
         cursor.moveToFirst();
@@ -82,8 +84,18 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         Cursor cursor = getCursorForQuestion(quizzNumber);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            //J'ajoute successivement l'id de la question et sont texte
             lcs.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+        cursor.close();
+    }
+
+    /** Méthode qui permet de charger les id_questions d'un quizz donné */
+    public void chargerLesQuestionsId(List<String> lcs, int quizzNumber) {
+        Cursor cursor = getCursorForQuestion(quizzNumber);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            lcs.add(cursor.getString(0));
             cursor.moveToNext();
         }
         cursor.close();
@@ -115,15 +127,6 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return this.db.delete("questions", " question = ?", strArr) > 0;
     }
 
-    public void chargerLesQuizz(List<String> mesQuizz) {
-        Cursor cursor = getCursorForQuizz();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            mesQuizz.add(cursor.getString(1));
-            cursor.moveToNext();
-        }
-        cursor.close();
-    }
 
     public int getNextId(String tableName) {
         String countQuery = "SELECT  * FROM " + tableName;
@@ -132,6 +135,14 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         int cnt = cursor.getCount();
         cursor.close();
         return cnt+1;
+    }
+
+    public int getQuizzId(String quizzName) {
+        this.db = getWritableDatabase();
+        Cursor cursor = this.db.rawQuery("SELECT id_quizz FROM quizz WHERE quizzName='" + quizzName + "'", null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        return Integer.parseInt(cursor.getString(0));
     }
 
     public long creerQuizz(int id_quizz, String quizzName) {
@@ -160,4 +171,48 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         values3.put("id_question", id_question);
         this.db.insert("proposition", null, values3);
     }
+
+    public void chargerLesQuizz(ArrayList<HashMap<String, String>> mesQuizz) {
+        Cursor cursor = getCursorForQuizz();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("id_quizz", cursor.getString(0));
+            map.put("quizzName", cursor.getString(1));
+            mesQuizz.add(map);
+            cursor.moveToNext();
+        }
+        cursor.close();
+    }
+
+    public boolean supprimerQuizz(String quizzName) {
+        String table = "quizz";
+        int id_quizz = getQuizzId(quizzName);
+
+        supprimerToutesLesQuestionDunQuizz(id_quizz);
+
+        String whereClause = "quizzName" + "=?";
+        String[] whereArgs = new String[] { quizzName  };
+        return db.delete(table, whereClause, whereArgs) > 0;
+    }
+
+    public boolean supprimerToutesLesQuestionDunQuizz(int id_quizz) {
+        ArrayList<String> listOfQuestionId = new ArrayList<>();
+        chargerLesQuestionsId(listOfQuestionId, id_quizz);
+        for (int i = 0 ; i < listOfQuestionId.size() ; i++) {
+            supprimerProposition(listOfQuestionId.get(i));
+        }
+
+        String whereClause = "id_quizz" + "=?";
+        String[] whereArgs = new String[] { String.valueOf(id_quizz) };
+        return db.delete("question", whereClause, whereArgs) > 0;
+    }
+
+    private boolean supprimerProposition(String s) {
+        String whereClause = "id_question" + "=?";
+        String[] whereArgs = new String[] { String.valueOf(s) };
+        return db.delete("proposition", whereClause, whereArgs) > 0;
+    }
+
+
 }
