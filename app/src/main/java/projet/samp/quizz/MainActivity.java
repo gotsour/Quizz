@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
-        alreadyDownloaded = settings.getBoolean("myIndice", false);
+        alreadyDownloaded = settings.getBoolean("alreadyDownloaded", false);
 
         database = new QuestionDataBase(this);
 
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         //Pour sauver le boolean qui permet de savoir si download a déjà été cliqué
         SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("myIndice", alreadyDownloaded);
+        editor.putBoolean("alreadyDownloaded", alreadyDownloaded);
         editor.commit();
     }
 }

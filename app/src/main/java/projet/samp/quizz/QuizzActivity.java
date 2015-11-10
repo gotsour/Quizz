@@ -186,7 +186,9 @@ public class QuizzActivity extends MainActivity {
 
         btnRetourQuizz.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(QuizzActivity.this, SelectQuizzActivity.class);
+                Intent intent = getIntent();
+                finish();
+                intent = new Intent(QuizzActivity.this, SelectQuizzActivity.class);
                 intent.putExtra("STATE", "play");
                 startActivity(intent);
             }

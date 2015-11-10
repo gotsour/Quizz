@@ -108,7 +108,9 @@ public class SelectQuizzActivity extends MainActivity {
 
                 if (action.equals("play")) {
                     // On ouvre le quizz en question et on joue
-                    Intent intent = new Intent(SelectQuizzActivity.this, QuizzActivity.class);
+                    Intent intent = getIntent();
+                    finish();
+                    intent = new Intent(SelectQuizzActivity.this, QuizzActivity.class);
                     intent.putExtra("quizzNumber", id_quizz);
                     startActivity(intent);
 
