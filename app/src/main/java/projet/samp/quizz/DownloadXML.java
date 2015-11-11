@@ -1,9 +1,7 @@
 package projet.samp.quizz;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,8 +72,8 @@ class DownloadXML extends AsyncTask<String, Void, ArrayList<Quizz>> {
                     }
 
                     Element indiceReponse = (Element) question.getElementsByTagName("Reponse").item(0);
-                        /* On indique l'indice de la proposition vrai dans la question courante du quizz courant */
-                    quizzsList.get(indice).questionList.get(j).setIndiceReponce(new Integer(indiceReponse.getAttribute("valeur")).intValue());
+                    /* On indique l'indice de la proposition vrai dans la question courante du quizz courant */
+                    quizzsList.get(indice).questionList.get(j).setIndiceReponce(Integer.valueOf(indiceReponse.getAttribute("valeur")));
                 }
 
                 indice++;
@@ -84,8 +82,4 @@ class DownloadXML extends AsyncTask<String, Void, ArrayList<Quizz>> {
         return quizzsList;
     }
 
-
-    protected void onPostExecute(Void args) {
-
-    }
 }

@@ -10,14 +10,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity {
 
     String URL = "https://dept-info.univ-fcomte.fr/joomla/images/CR0700/Quizzs.xml";
     QuestionDataBase database;
-    static ArrayList<Quizz> quizzsList = new ArrayList<>();
     public static final String MyPREFERENCES = "MyPrefs";
     public boolean alreadyDownloaded = false;
 
@@ -67,11 +64,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 quizzsList = xml.get();
                 Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
-            } catch (InterruptedException e) {
-                Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
@@ -142,6 +135,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("alreadyDownloaded", alreadyDownloaded);
-        editor.commit();
+        editor.apply();
     }
 }

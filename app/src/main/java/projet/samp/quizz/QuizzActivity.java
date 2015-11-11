@@ -1,11 +1,9 @@
 package projet.samp.quizz;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,13 +11,11 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by twesterm on 08/10/15.
- */
+
 public class QuizzActivity extends MainActivity {
 
-    List<String> mesQuestions = new ArrayList<String>();
-    List<String> mesReponses = new ArrayList<String>();
+    List<String> mesQuestions = new ArrayList<>();
+    List<String> mesReponses = new ArrayList<>();
     QuestionDataBase questionDB ;
     int indiceReponse;
 
@@ -70,7 +66,7 @@ public class QuizzActivity extends MainActivity {
     /* Méthode qui affiche les question et charge les élements */
     public void joue(int indice) {
 
-        mesReponses = new ArrayList<String>();
+        mesReponses = new ArrayList<>();
 
         questionDB.chargerLesReponses(mesReponses, Integer.parseInt(mesQuestions.get(indice)));
 
@@ -118,7 +114,7 @@ public class QuizzActivity extends MainActivity {
     View.OnClickListener myhandler1 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (verifieReponse(v.getId() + 1, indiceReponse) == true) {
+            if (verifieReponse(v.getId() + 1, indiceReponse)) {
                 if (estAlleVoirReponse) {
                     Toast.makeText(QuizzActivity.this, "VOUS AVEZ TRICHÉ !", Toast.LENGTH_SHORT).show();
                     scoreJeu-=2;
@@ -178,7 +174,7 @@ public class QuizzActivity extends MainActivity {
 
         btnRetourQuizz.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = getIntent();
+                Intent intent;
                 finish();
                 intent = new Intent(QuizzActivity.this, SelectQuizzActivity.class);
                 intent.putExtra("STATE", "play");
@@ -190,11 +186,7 @@ public class QuizzActivity extends MainActivity {
 
     private boolean verifieReponse(int idButton, int indiceReponse) {
         boolean result;
-        if ( idButton == indiceReponse) {
-            result = true;
-        } else {
-            result = false;
-        }
+        result = idButton == indiceReponse;
         return result;
     }
 

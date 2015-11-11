@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -198,7 +197,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         Cursor cursor = getCursorForQuizz();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            HashMap<String, String> map = new HashMap<String, String>();
+            HashMap<String, String> map = new HashMap<>();
             map.put("id_quizz", cursor.getString(0));
             map.put("quizzName", cursor.getString(1));
             mesQuizz.add(map);

@@ -6,9 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-/**
- * Created by twesterm on 01/10/15.
- */
 public class ShowAnswerActivity extends MainActivity {
 
     /** Called when the activity is first created. */

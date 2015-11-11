@@ -15,16 +15,4 @@ public class Quizz {
         this.quizzName = quizzName;
     }
 
-    public void setQuizzName(String quizzName) {
-        this.quizzName = quizzName;
-    }
-
-    public ArrayList<Question> getQuestionList() {
-        return this.questionList;
-    }
-
-    public void setQuestionList(ArrayList<Question> questionList) {
-        this.questionList = questionList;
-    }
-
 }
