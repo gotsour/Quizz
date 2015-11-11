@@ -25,7 +25,7 @@ public class QuizzActivity extends MainActivity {
 
     TextView question;
     TextView score;
-    int indiceQuestion;
+    int indiceQuestion = 0;
     boolean estAlleVoirReponse;
     LinearLayout layoutProposition;
     LinearLayout layoutQuestion;
@@ -37,8 +37,6 @@ public class QuizzActivity extends MainActivity {
 
     private int scoreJeu = 0;
 
-    public static final String MyPREFERENCES = "MyPrefs" ;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +45,6 @@ public class QuizzActivity extends MainActivity {
         quizzNumber = intent.getIntExtra("quizzNumber", 0);
 
         // Restore preferences
-        SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
-        indiceQuestion = settings.getInt("myIndice", 0);
         setContentView(R.layout.quizz);
 
         /* On sélectionne les questions et les réponses qui correspondent au quizz passé en paramètre (quizzNumber) */
@@ -64,11 +60,7 @@ public class QuizzActivity extends MainActivity {
         score = (TextView) findViewById(R.id.textViewScore);
         score.setText(String.valueOf(scoreJeu));
 
-        /**
-         * LIGNE JUSTE EN DESSOUS A ENLEVER PLUS TARD
-         */
-        indiceQuestion = 1;
-        joue(indiceQuestion - 1);
+        joue(indiceQuestion);
 
         buttonNext.setOnClickListener(myhandlerButtonNext);
         buttonVoirReponse.setOnClickListener(myhandlerButtonVoirReponse);
@@ -103,12 +95,12 @@ public class QuizzActivity extends MainActivity {
         @Override
         public void onClick(View v) {
             indiceQuestion+=2;
-            if (indiceQuestion > mesQuestions.size()) {
+            if (indiceQuestion >= mesQuestions.size()) {
 
                 finQuizz();
 
             } else {
-                joue(indiceQuestion-1);
+                joue(indiceQuestion);
             }
         }
     };
@@ -129,26 +121,26 @@ public class QuizzActivity extends MainActivity {
             if (verifieReponse(v.getId() + 1, indiceReponse) == true) {
                 if (estAlleVoirReponse) {
                     Toast.makeText(QuizzActivity.this, "VOUS AVEZ TRICHÉ !", Toast.LENGTH_SHORT).show();
-                    scoreJeu--;
+                    scoreJeu-=2;
                     score.setText(String.valueOf(scoreJeu));
                     estAlleVoirReponse = false;
                 } else {
                     Toast.makeText(QuizzActivity.this, "CORRECT !", Toast.LENGTH_SHORT).show();
-                    scoreJeu+=2;
+                    scoreJeu+=4;
                     score.setText(String.valueOf(scoreJeu));
                 }
             } else {
                 Toast.makeText(QuizzActivity.this, "MAUVAISE REPONSE !", Toast.LENGTH_SHORT).show();
-                scoreJeu-=2;
+                scoreJeu-=1;
                 score.setText(String.valueOf(scoreJeu));
             }
             indiceQuestion+=2;
-            if (indiceQuestion > mesQuestions.size()) {
+            if (indiceQuestion >= mesQuestions.size()) {
 
                 finQuizz();
 
             } else {
-                joue(indiceQuestion-1);
+                joue(indiceQuestion);
             }
         }
     };
@@ -206,17 +198,5 @@ public class QuizzActivity extends MainActivity {
         return result;
     }
 
-
-    @Override
-    protected void onStop(){
-        super.onStop();
-        // We need an Editor object to make preference changes.
-        // All objects are from android.context.Context
-        SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("myIndice", indiceQuestion);
-        // Commit the edits!
-        editor.commit();
-    }
 
 }
