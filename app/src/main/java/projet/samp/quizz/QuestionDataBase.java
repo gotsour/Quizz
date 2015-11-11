@@ -45,7 +45,10 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         database.execSQL(DATABASE_CREATE_TABLE_QUESTION);
         database.execSQL(DATABASE_CREATE_TABLE_PROPOSITION);
 
-        /*database.execSQL("INSERT INTO quizz VALUES (1, 'Quizz 1')");
+        /**
+         *      BASE DE TEST
+         *
+         database.execSQL("INSERT INTO quizz VALUES (1, 'Quizz 1')");
         database.execSQL("INSERT INTO quizz VALUES (2, 'Quizz 2')");
         database.execSQL("INSERT INTO question VALUES (1, 'Question 11', 1, 3)");
         database.execSQL("INSERT INTO question VALUES (2, 'Question 12', 1, 2)");
@@ -121,22 +124,37 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return Integer.parseInt(cursor.getString(0));
     }
 
-    public boolean supprimeQuestion(String question) {
+    /* Retourne l'id du question à partir de son texte */
+    public int getIdQuestion(String questionTexte) {
+        this.db = getWritableDatabase();
+        Cursor cursor = this.db.rawQuery("SELECT id_question FROM question WHERE texteQuestion='" + questionTexte + "'", null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        return Integer.parseInt(cursor.getString(0));
+    }
+
+    /* Permet de supprimer une question à partir de son texte */
+    public boolean supprimerQuestion(String question) {
         String[] strArr = new String[1];
         strArr[0] = question;
-        return this.db.delete("questions", " question = ?", strArr) > 0;
+
+        int id_question = getIdQuestion(question);
+        supprimerProposition(String.valueOf(id_question));
+
+        return this.db.delete("question", "texteQuestion = ?", strArr) > 0;
     }
 
-
+    /* Retourne le prochain id de la table passée en paramètre */
     public int getNextId(String tableName) {
-        String countQuery = "SELECT  * FROM " + tableName;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        int cnt = cursor.getCount();
+        Cursor cursor = db.rawQuery("SELECT seq FROM sqlite_sequence WHERE name=?",
+                new String[] { tableName });
+        int last = (cursor.moveToFirst() ? cursor.getInt(0) : 0);
         cursor.close();
-        return cnt+1;
+        return last+1;
     }
 
+    /* Retourne l'id d'un quizz en prenant en compte son nom */
     public int getQuizzId(String quizzName) {
         this.db = getWritableDatabase();
         Cursor cursor = this.db.rawQuery("SELECT id_quizz FROM quizz WHERE quizzName='" + quizzName + "'", null);
@@ -145,6 +163,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return Integer.parseInt(cursor.getString(0));
     }
 
+    /* Permet de créer un quizz */
     public long creerQuizz(int id_quizz, String quizzName) {
         this.db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -153,6 +172,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return db.insert("quizz", null, values);
     }
 
+    /* Pemret de créer une question */
     public void creerQuestion(int id_question, String texteQuestion, int id_quizz, int indiceReponse) {
         this.db = getWritableDatabase();
         ContentValues values2 = new ContentValues(4);
@@ -163,6 +183,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         this.db.insert("question", null, values2);
     }
 
+    /* Permet de créer un une proposition */
     public void creerProposition(int id_proposition, String texteProposition, int id_question) {
         this.db = getWritableDatabase();
         ContentValues values3 = new ContentValues(3);
@@ -172,6 +193,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         this.db.insert("proposition", null, values3);
     }
 
+    /* Permet de renvoyer une arraylist de hashmap comprenant l'id du quizz et son nom */
     public void chargerLesQuizz(ArrayList<HashMap<String, String>> mesQuizz) {
         Cursor cursor = getCursorForQuizz();
         cursor.moveToFirst();
@@ -185,6 +207,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    /* Permet de supprimer un Quizz entier à partir de son nom */
     public boolean supprimerQuizz(String quizzName) {
         String table = "quizz";
         int id_quizz = getQuizzId(quizzName);
@@ -196,6 +219,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return db.delete(table, whereClause, whereArgs) > 0;
     }
 
+    /* Permet de supprimer toutes les questions d'un quizz à partir de l'id du quizz */
     public boolean supprimerToutesLesQuestionDunQuizz(int id_quizz) {
         ArrayList<String> listOfQuestionId = new ArrayList<>();
         chargerLesQuestionsId(listOfQuestionId, id_quizz);
@@ -208,9 +232,10 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         return db.delete("question", whereClause, whereArgs) > 0;
     }
 
-    private boolean supprimerProposition(String s) {
+    /* Permet de supprimer toutes les propsitions d'un quizz à partir de l'id de la question */
+    private boolean supprimerProposition(String id_question) {
         String whereClause = "id_question" + "=?";
-        String[] whereArgs = new String[] { String.valueOf(s) };
+        String[] whereArgs = new String[] { String.valueOf(id_question) };
         return db.delete("proposition", whereClause, whereArgs) > 0;
     }
 

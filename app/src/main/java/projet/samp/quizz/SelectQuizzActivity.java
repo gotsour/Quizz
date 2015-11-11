@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,9 @@ public class SelectQuizzActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_quizz);
 
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.hide();
+
         questionDB = new QuestionDataBase(this);
         questionDB.chargerLesQuizz(mesQuizz);
 
@@ -53,13 +57,8 @@ public class SelectQuizzActivity extends MainActivity {
 
 
         if (action.equals("edit")) {
-            LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayoutSelectQuizz);
-            final Button btnTag = new Button(this);
-            btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            btnTag.setId(View.generateViewId());
-            btnTag.setText("Ajouter un quizz");
-            layout.addView(btnTag);
-            btnTag.setOnClickListener(myhandler1);
+            floatingActionButton.show();
+            floatingActionButton.setOnClickListener(myhandler1);
 
             listQuizz.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override

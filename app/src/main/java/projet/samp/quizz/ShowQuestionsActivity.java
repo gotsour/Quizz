@@ -3,7 +3,9 @@ package projet.samp.quizz;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,11 +34,6 @@ public class ShowQuestionsActivity extends MainActivity {
     ArrayAdapter adapter;
     QuestionDataBase questionDB ;
 
-    EditText editQuestion;
-    RadioButton buttonVrai;
-    RadioButton buttonFaux;
-    Button buttonAjouter;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,8 +42,6 @@ public class ShowQuestionsActivity extends MainActivity {
 
         Intent intent = getIntent();
         final int quizzNumber = intent.getIntExtra("quizzNumber", 0);
-
-        buttonAjouter = (Button) findViewById(R.id.buttonAdd);
 
         questionDB = new QuestionDataBase(this);
         questionDB.chargerLesQuestionsSansId(mesQuestions, quizzNumber);
@@ -62,9 +57,11 @@ public class ShowQuestionsActivity extends MainActivity {
         /* On applique l'adapter a la listView */
         vueQuestions.setAdapter(adapter);
 
-        /* Si on clique sur le bouton Ajouter */
-        buttonAjouter.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
+
                 // get prompts.xml view
                 LayoutInflater li = LayoutInflater.from(ShowQuestionsActivity.this);
                 View promptsView = li.inflate(R.layout.nouvelle_question, null);
@@ -79,7 +76,8 @@ public class ShowQuestionsActivity extends MainActivity {
                 final EditText propositionTexte2 = (EditText) promptsView.findViewById(R.id.editTextProposition2);
                 final EditText propositionTexte3 = (EditText) promptsView.findViewById(R.id.editTextProposition3);
                 final EditText propositionTexte4 = (EditText) promptsView.findViewById(R.id.editTextProposition4);
-                final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);;
+                final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);
+                ;
 
                 // set dialog message
                 alertDialogBuilder
@@ -141,9 +139,45 @@ public class ShowQuestionsActivity extends MainActivity {
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 // show it
                 alertDialog.show();
+
             }
         });
 
 
-    }
+        vueQuestions.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) {
+
+                TextView c = (TextView) arg1.findViewById(android.R.id.text1);
+                final String questionTexte = c.getText().toString();
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(ShowQuestionsActivity.this);
+
+                alert.setTitle("Suppression Question");
+                alert.setMessage("Etes vous sûr de supprimer cette question ?");
+
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        questionDB.supprimerQuestion(questionTexte);
+                        mesQuestions.remove(pos);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Canceled.
+                    }
+                });
+
+                alert.show();
+                return true;
+            }
+        });
+
+
+
+            }
 }
