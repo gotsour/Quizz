@@ -147,7 +147,7 @@ public class ShowQuestionsActivity extends MainActivity {
                                     }
 
                                     int nextPropositionId = questionDB.getNextId("proposition");
-                                    if (propositionTexte1.getText().toString() != null) {
+                                    if (!propositionTexte1.getText().toString().equals("")) {
                                         if (!propositionTexte1.getText().toString().equals(finalPropositionTexte1Save)) {
                                             if (finalPropositionTexte1Save == null) {
                                                 /* On créér une nouvelle proposition */
@@ -158,12 +158,13 @@ public class ShowQuestionsActivity extends MainActivity {
                                             }
                                         }
                                     } else {
-                                        /* On supprime la proposition 1 */
-                                        questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte1Save, id_question));
-
+                                        if (finalPropositionTexte1Save != null) {
+                                            /* On supprime la proposition 1 */
+                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte1Save, id_question));
+                                        }
                                     }
 
-                                    if (propositionTexte2.getText().toString() != null) {
+                                    if (!propositionTexte2.getText().toString().equals("")) {
                                         if (!propositionTexte2.getText().toString().equals(finalPropositionTexte2Save)) {
                                             if (finalPropositionTexte2Save == null) {
                                                 /* On créér une nouvelle proposition */
@@ -175,29 +176,31 @@ public class ShowQuestionsActivity extends MainActivity {
                                             }
                                         }
                                     } else {
-                                        /* On supprime la proposition 2 */
-                                        questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte2Save, id_question));
-
+                                        if (finalPropositionTexte2Save != null) {
+                                            /* On supprime la proposition 2 */
+                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte2Save, id_question));
+                                        }
                                     }
 
-                                    if (propositionTexte3.getText().toString() != null) {
+                                    if (!propositionTexte3.getText().toString().equals("")) {
                                         if (!propositionTexte3.getText().toString().equals(finalPropositionTexte3Save)) {
                                             if (finalPropositionTexte3Save == null) {
                                                 /* On créér une nouvelle proposition */
                                                 nextPropositionId++;
                                                 questionDB.creerProposition(nextPropositionId, propositionTexte3.getText().toString(), id_question);
                                             } else {
-                                            /* On update la proposition 3 */
+                                                /* On update la proposition 3 */
                                                 questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question), propositionTexte3.getText().toString());
                                             }
                                         }
                                     } else {
-                                        /* On supprime la proposition 3 */
-                                        questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question));
-
+                                        if (finalPropositionTexte3Save != null) {
+                                            /* On supprime la proposition 3 */
+                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question));
+                                        }
                                     }
 
-                                    if (propositionTexte4.getText().toString() != null) {
+                                    if (!propositionTexte4.getText().toString().equals("")) {
                                         if (!propositionTexte4.getText().toString().equals(finalPropositionTexte4Save)) {
                                             if (finalPropositionTexte4Save == null) {
                                                 nextPropositionId++;
@@ -209,8 +212,10 @@ public class ShowQuestionsActivity extends MainActivity {
                                             }
                                         }
                                     } else {
-                                        /* On supprime la proposition 4 */
-                                        questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte4Save, id_question));
+                                        if (finalPropositionTexte4Save != null) {
+                                            /* On supprime la proposition 4 */
+                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte4Save, id_question));
+                                        }
 
                                     }
 
@@ -229,7 +234,7 @@ public class ShowQuestionsActivity extends MainActivity {
 
             // create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
-            // show it
+                                // show it
             alertDialog.show();
         }
     };
@@ -301,6 +306,9 @@ public class ShowQuestionsActivity extends MainActivity {
                                     if (!questionTexte.getText().toString().equals("")) {
                                         if (!indiceReponse.getText().toString().equals("")) {
                                             questionDB.creerQuestion(nextQuestionId, questionTexte.getText().toString(), quizzNumber, Integer.parseInt(indiceReponse.getText().toString()));
+                                            mesQuestions.add(questionTexte.getText().toString());
+                                        } else {
+                                            questionDB.creerQuestion(nextQuestionId, questionTexte.getText().toString(), quizzNumber, 0);
                                             mesQuestions.add(questionTexte.getText().toString());
                                         }
                                     }
