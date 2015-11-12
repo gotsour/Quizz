@@ -26,6 +26,7 @@ public class QuizzActivity extends MainActivity {
     LinearLayout layoutProposition;
     LinearLayout layoutQuestion;
     LinearLayout layoutButton;
+    LinearLayout layoutScore;
     Button buttonNext;
     Button buttonVoirReponse;
     int quizzNumber;
@@ -52,6 +53,7 @@ public class QuizzActivity extends MainActivity {
         layoutProposition = (LinearLayout) findViewById(R.id.linearLayoutReponse);
         layoutButton = (LinearLayout) findViewById(R.id.linearLayoutButton);
         layoutQuestion = (LinearLayout) findViewById(R.id.linearLayoutQuestion);
+        layoutScore = (LinearLayout) findViewById(R.id.linearLayoutScore);
 
         score = (TextView) findViewById(R.id.textViewScore);
         score.setText(String.valueOf(scoreJeu));
@@ -146,10 +148,12 @@ public class QuizzActivity extends MainActivity {
         layoutQuestion.removeAllViews();
         layoutButton.removeAllViews();
         layoutProposition.removeAllViews();
+        layoutScore.removeAllViews();
 
         final Button btnRejouer = new Button(this);
         final Button btnRetourQuizz = new Button(this);
         final TextView scoreFinQuizz = new TextView(this);
+        scoreFinQuizz.setTextSize(50);
 
         btnRejouer.setText("Rejouer");
         btnRetourQuizz.setText("Retour aux quizzs");

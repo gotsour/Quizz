@@ -28,6 +28,6 @@
         android:layout_marginRight="@dimen/fab_button_margin_right"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
-        app:borderWidth="0dp"/>
+        app:borderWidth="0dp" />
 
 </RelativeLayout>

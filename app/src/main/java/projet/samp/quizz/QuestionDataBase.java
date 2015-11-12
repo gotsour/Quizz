@@ -126,7 +126,23 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     /* Retourne l'id du question à partir de son texte */
     public int getIdQuestion(String questionTexte) {
         this.db = getWritableDatabase();
-        Cursor cursor = this.db.rawQuery("SELECT id_question FROM question WHERE texteQuestion='" + questionTexte + "'", null);
+
+        String query = "SELECT id_question FROM question WHERE texteQuestion= ?";
+        Cursor cursor = this.db.rawQuery(query, new String[] { questionTexte });
+
+        if (cursor != null)
+            cursor.moveToFirst();
+        return Integer.parseInt(cursor.getString(0));
+    }
+
+
+    /* Retourne l'id d'une proposition à partir de son texte */
+    public int getIdProposition(String propositionTexte, int id_question) {
+        this.db = getWritableDatabase();
+
+        String query = "SELECT id_proposition FROM proposition WHERE texteProposition= ? AND id_question = ?";
+        Cursor cursor = this.db.rawQuery(query, new String[] { propositionTexte, String.valueOf(id_question)});
+
         if (cursor != null)
             cursor.moveToFirst();
         return Integer.parseInt(cursor.getString(0));
@@ -146,8 +162,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     /* Retourne le prochain id de la table passée en paramètre */
     public int getNextId(String tableName) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT seq FROM sqlite_sequence WHERE name=?",
-                new String[] { tableName });
+        Cursor cursor = db.rawQuery("SELECT seq FROM sqlite_sequence WHERE name=?", new String[] { tableName });
         int last = (cursor.moveToFirst() ? cursor.getInt(0) : 0);
         cursor.close();
         return last+1;
@@ -156,7 +171,8 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     /* Retourne l'id d'un quizz en prenant en compte son nom */
     public int getQuizzId(String quizzName) {
         this.db = getWritableDatabase();
-        Cursor cursor = this.db.rawQuery("SELECT id_quizz FROM quizz WHERE quizzName='" + quizzName + "'", null);
+        String query = "SELECT id_quizz FROM quizz WHERE quizzName=?";
+        Cursor cursor = this.db.rawQuery(query, new String[] { quizzName });
         if (cursor != null)
             cursor.moveToFirst();
         return Integer.parseInt(cursor.getString(0));
@@ -232,11 +248,38 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     }
 
     /* Permet de supprimer toutes les propsitions d'un quizz à partir de l'id de la question */
-    private boolean supprimerProposition(String id_question) {
+    public boolean supprimerProposition(String id_question) {
         String whereClause = "id_question" + "=?";
         String[] whereArgs = new String[] { String.valueOf(id_question) };
         return db.delete("proposition", whereClause, whereArgs) > 0;
     }
+
+    /* Modifie le texte d'un question */
+    public void updateQuestion(int id_question, String texteQuestion) {
+        ContentValues data=new ContentValues();
+        data.put("texteQuestion", texteQuestion);
+        db.update("question", data, "id_question=" + id_question, null);
+    }
+
+    /* Modifie l'indice de réponse d'une question */
+    public void updateIndiceReponse(int id_question, int indice) {
+        ContentValues data=new ContentValues();
+        data.put("id_reponse", indice);
+        db.update("question", data, "id_question=" + id_question, null);
+    }
+
+    /* Modifie l'indice de réponse d'une question */
+    public void updateProposition(int id_proposition, String texteProposition) {
+        ContentValues data=new ContentValues();
+        data.put("texteProposition", texteProposition);
+        db.update("proposition", data, "id_proposition=" + id_proposition, null);
+    }
+
+    /* Permet de supprimer une Proposition à partir de son id */
+    public boolean supprimerProposition(int id_proposition) {
+        return this.db.delete("proposition", "id_proposition = ?", new String[] {String.valueOf(id_proposition)}) > 0;
+    }
+
 
 
 }
