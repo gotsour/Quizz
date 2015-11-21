@@ -59,14 +59,16 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <GridLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/linearLayoutQuestion"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/linearLayoutButton"
-        android:id="@+id/linearLayoutReponse"></LinearLayout>
+        android:id="@+id/linearLayoutReponse"
+        android:columnCount="2"
+        android:rowCount="2"></GridLayout>
 
     <LinearLayout
         android:orientation="horizontal"

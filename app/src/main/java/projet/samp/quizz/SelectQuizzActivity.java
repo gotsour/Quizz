@@ -147,7 +147,7 @@ public class SelectQuizzActivity extends MainActivity {
                 }
             });
 
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            alert.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     // Canceled.
                 }

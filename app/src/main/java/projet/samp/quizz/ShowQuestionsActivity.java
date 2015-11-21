@@ -3,7 +3,11 @@ package projet.samp.quizz;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,8 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -52,7 +58,11 @@ public class ShowQuestionsActivity extends MainActivity {
 
         /* Si on clique sur le petit plus en bas à droite */
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        floatingActionButton.setOnClickListener(ajouterQuestion);
+        floatingActionButton.setOnClickListener(ajouterQuestionTexte);
+
+        /* Si on clique sur le petit image en bas à droite */
+        FloatingActionButton floatingActionButton2 = (FloatingActionButton) findViewById(R.id.fab2);
+        floatingActionButton2.setOnClickListener(ajouterQuestionImage);
 
         /* En cas d'appui long sur un item */
         vueQuestions.setOnItemLongClickListener(supprimerQuestion);
@@ -131,9 +141,10 @@ public class ShowQuestionsActivity extends MainActivity {
                                 public void onClick(DialogInterface dialog, int id) {
 
 
-                                    if (!questionTexte.getText().toString().equals("") && !questionTexte.getText().toString().equals(questionTexteSave)) {
+                                    if (!questionTexte.getText().toString().equals("") && !questionTexte.getText().toString().equals(questionTexteSave) || !indiceReponse.getText().toString().equals("") && Integer.parseInt(indiceReponse.getText().toString()) != id_reponseSave) {
 
-                                        if (!indiceReponse.getText().toString().equals("") && !indiceReponse.getText().toString().equals(id_reponseSave)) {
+                                        if (!indiceReponse.getText().toString().equals("") && Integer.parseInt(indiceReponse.getText().toString()) != id_reponseSave) {
+
                                             /* On update questionTexte et indiceQuestion */
                                             questionDB.updateQuestion(id_question, questionTexte.getText().toString());
                                             questionDB.updateIndiceReponse(id_question, Integer.parseInt(indiceReponse.getText().toString()));
@@ -224,7 +235,7 @@ public class ShowQuestionsActivity extends MainActivity {
                             }
 
                     )
-                    .setNegativeButton("Cancel",
+                    .setNegativeButton("Annuler",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
@@ -260,7 +271,7 @@ public class ShowQuestionsActivity extends MainActivity {
                 }
             });
 
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            alert.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     // Canceled.
                 }
@@ -271,9 +282,10 @@ public class ShowQuestionsActivity extends MainActivity {
         }
     };
 
-    View.OnClickListener ajouterQuestion = new View.OnClickListener() {
+    View.OnClickListener ajouterQuestionTexte = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
             // get prompts.xml view
             LayoutInflater li = LayoutInflater.from(ShowQuestionsActivity.this);
             View promptsView = li.inflate(R.layout.nouvelle_question, null);
@@ -297,10 +309,10 @@ public class ShowQuestionsActivity extends MainActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
-                                    /**
-                                     * IL FAUT ENCORE VEVRIFIER QUE LE NOMBRE PROPOSITION >= 2
-                                     * ET QUE LE NUMERO DE REPONSE EST COMPRIS ENTRE 1 ET NOMBRE PROPOSITION
-                                     */
+                                    //
+                                    //IL FAUT ENCORE VEVRIFIER QUE LE NOMBRE PROPOSITION >= 2
+                                    //ET QUE LE NUMERO DE REPONSE EST COMPRIS ENTRE 1 ET NOMBRE PROPOSITION
+                                    //
 
                                     int nextQuestionId = database.getNextId("question");
                                     if (!questionTexte.getText().toString().equals("")) {
@@ -340,7 +352,7 @@ public class ShowQuestionsActivity extends MainActivity {
                             }
 
                     )
-                    .setNegativeButton("Cancel",
+                    .setNegativeButton("Annuler",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
@@ -354,7 +366,21 @@ public class ShowQuestionsActivity extends MainActivity {
             alertDialog.show();
 
         }
+
     };
 
+
+    View.OnClickListener ajouterQuestionImage = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Intent intent = new Intent(ShowQuestionsActivity.this, AddImageQuestionActivity.class);
+            intent.putExtra("quizzNumber", quizzNumber);
+            startActivity(intent);
+            finish();
+
+        }
+
+    };
 
 }

@@ -1,9 +1,12 @@
 package projet.samp.quizz;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +26,7 @@ public class QuizzActivity extends MainActivity {
     TextView score;
     int indiceQuestion = 0;
     boolean estAlleVoirReponse;
-    LinearLayout layoutProposition;
+    GridLayout layoutProposition;
     LinearLayout layoutQuestion;
     LinearLayout layoutButton;
     LinearLayout layoutScore;
@@ -50,7 +53,7 @@ public class QuizzActivity extends MainActivity {
 
         buttonNext = (Button) findViewById(R.id.buttonNext);
         buttonVoirReponse = (Button) findViewById(R.id.buttonVoirReponse);
-        layoutProposition = (LinearLayout) findViewById(R.id.linearLayoutReponse);
+        layoutProposition = (GridLayout) findViewById(R.id.linearLayoutReponse);
         layoutButton = (LinearLayout) findViewById(R.id.linearLayoutButton);
         layoutQuestion = (LinearLayout) findViewById(R.id.linearLayoutQuestion);
         layoutScore = (LinearLayout) findViewById(R.id.linearLayoutScore);
@@ -79,12 +82,28 @@ public class QuizzActivity extends MainActivity {
         question.setText(mesQuestions.get(indice+1));
 
         for (int i = 0 ; i < mesReponses.size() ; i++) {
-            final Button btnTag = new Button(this);
-            btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            btnTag.setId(i);
-            btnTag.setText(mesReponses.get(i));
-            layoutProposition.addView(btnTag);
-            btnTag.setOnClickListener(myhandler1);
+
+            // Permet de détecter si on a une image ou pas
+            if ( mesReponses.get(i).startsWith("/")) {
+
+                final ImageButton imgBtnTag = new ImageButton(this);
+                imgBtnTag.setLayoutParams(new LinearLayout.LayoutParams(300,300));
+                imgBtnTag.setAdjustViewBounds(true);
+                imgBtnTag.setId(i);
+                imgBtnTag.setImageBitmap(BitmapFactory.decodeFile(mesReponses.get(i)));
+
+                layoutProposition.addView(imgBtnTag);
+                imgBtnTag.setOnClickListener(myhandler1);
+
+            } else {
+
+                final Button btnTag = new Button(this);
+                btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                btnTag.setId(i);
+                btnTag.setText(mesReponses.get(i));
+                layoutProposition.addView(btnTag);
+                btnTag.setOnClickListener(myhandler1);
+            }
         }
 
     }
@@ -163,9 +182,9 @@ public class QuizzActivity extends MainActivity {
         btnRetourQuizz.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         scoreFinQuizz.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        layoutProposition.addView(btnRejouer);
-        layoutProposition.addView(btnRetourQuizz);
-        layoutProposition.addView(scoreFinQuizz);
+        layoutQuestion.addView(btnRejouer);
+        layoutQuestion.addView(btnRetourQuizz);
+        layoutQuestion.addView(scoreFinQuizz);
 
         btnRejouer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
