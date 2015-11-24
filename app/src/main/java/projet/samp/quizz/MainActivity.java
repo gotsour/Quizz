@@ -1,7 +1,10 @@
 package projet.samp.quizz;
 
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.CursorIndexOutOfBoundsException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.*;
@@ -15,18 +18,16 @@ public class MainActivity extends AppCompatActivity {
 
     String URL = "https://dept-info.univ-fcomte.fr/joomla/images/CR0700/Quizzs.xml";
     QuestionDataBase database;
-    public static final String MyPREFERENCES = "MyPrefs";
-    public boolean alreadyDownloaded = false;
+    ArrayList<Quizz> quizzsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        // Restore preferences
-        SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
-        alreadyDownloaded = settings.getBoolean("alreadyDownloaded", false);
+        quizzsList=new ArrayList<>();
 
+        //this.deleteDatabase("questions.db");
         database = new QuestionDataBase(this);
 
         Button boutonJouer = (Button) findViewById(R.id.buttonJouer);
@@ -58,20 +59,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void download() {
-        if (!alreadyDownloaded) {
-            DownloadXML xml = (DownloadXML) new DownloadXML().execute(URL);
-            ArrayList<Quizz> quizzsList = new ArrayList<>();
-            try {
-                quizzsList = xml.get();
-                Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
-            } catch (InterruptedException | ExecutionException e) {
-                Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
+
+        int testDatabaseAnimal=0;
+        int testDatabaseInfo=0;
+        int testDatabaseCulture=0;
+
+        try {
+            testDatabaseAnimal = database.getQuizzId("Monde Animal");
+            testDatabaseInfo = database.getQuizzId("Informatique");
+            testDatabaseCulture = database.getQuizzId("Culture générale");
+        } catch (CursorIndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+
+        if (isNetworkAvailable()) {
+            if (testDatabaseAnimal == 0 && testDatabaseCulture == 0 && testDatabaseInfo == 0) {
+                DownloadXML xml = (DownloadXML) new DownloadXML().execute(URL);
+                try {
+                    quizzsList = xml.get();
+                    Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
+                    insereBDD(quizzsList);
+                } catch (InterruptedException | ExecutionException e) {
+                    Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "Vous avez déjà téléchargé les quizz !", Toast.LENGTH_SHORT).show();
             }
-            insereBDD(quizzsList);
-            alreadyDownloaded = true;
-        } else {
-            Toast.makeText(MainActivity.this, "Vous avez déjà téléchargé les quizz !", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(MainActivity.this, "Vous n'êtes pas connecté à internet !", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -128,13 +145,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onStop(){
-        super.onStop();
-        //Pour sauver le boolean qui permet de savoir si download a déjà été cliqué
-        SharedPreferences settings = getSharedPreferences(MyPREFERENCES, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("alreadyDownloaded", alreadyDownloaded);
-        editor.apply();
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

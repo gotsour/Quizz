@@ -2,12 +2,17 @@ package projet.samp.quizz;
 
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +31,7 @@ public class QuizzActivity extends MainActivity {
     TextView score;
     int indiceQuestion = 0;
     boolean estAlleVoirReponse;
-    GridLayout layoutProposition;
+    TableLayout layoutProposition;
     LinearLayout layoutQuestion;
     LinearLayout layoutButton;
     LinearLayout layoutScore;
@@ -53,7 +58,7 @@ public class QuizzActivity extends MainActivity {
 
         buttonNext = (Button) findViewById(R.id.buttonNext);
         buttonVoirReponse = (Button) findViewById(R.id.buttonVoirReponse);
-        layoutProposition = (GridLayout) findViewById(R.id.linearLayoutReponse);
+        layoutProposition = (TableLayout) findViewById(R.id.layoutProposition);
         layoutButton = (LinearLayout) findViewById(R.id.linearLayoutButton);
         layoutQuestion = (LinearLayout) findViewById(R.id.linearLayoutQuestion);
         layoutScore = (LinearLayout) findViewById(R.id.linearLayoutScore);
@@ -71,41 +76,72 @@ public class QuizzActivity extends MainActivity {
     /* Méthode qui affiche les question et charge les élements */
     public void joue(int indice) {
 
+        TableRow tableRow1 = new TableRow(this);
+        TableRow tableRow2 = new TableRow(this);
+        TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams rowParamsImg = new TableRow.LayoutParams(300, 300);
+        rowParams.setMargins(10,10,10,10);
+        rowParamsImg.setMargins(10,10,10,10);
+
+        tableRow1.setLayoutParams(tableParams);
+        tableRow2.setLayoutParams(tableParams);
+
         mesReponses = new ArrayList<>();
 
-        questionDB.chargerLesReponses(mesReponses, Integer.parseInt(mesQuestions.get(indice)));
+        // Le try permet de lever une exception si jamais il n'y a pas de questions dans le quizz
+        try {
+            questionDB.chargerLesReponses(mesReponses, Integer.parseInt(mesQuestions.get(indice)));
 
-        indiceReponse = questionDB.getIndiceReponse(Integer.parseInt(mesQuestions.get(indice)));
-        layoutProposition.removeAllViews();
+            indiceReponse = questionDB.getIndiceReponse(Integer.parseInt(mesQuestions.get(indice)));
+            layoutProposition.removeAllViews();
 
-        question = (TextView) findViewById(R.id.textViewQuestion);
-        question.setText(mesQuestions.get(indice+1));
+            question = (TextView) findViewById(R.id.textViewQuestion);
+            question.setText(mesQuestions.get(indice + 1));
 
-        for (int i = 0 ; i < mesReponses.size() ; i++) {
+            for (int i = 0; i < mesReponses.size(); i++) {
 
-            // Permet de détecter si on a une image ou pas
-            if ( mesReponses.get(i).startsWith("/")) {
+                // Permet de détecter si on a une image ou pas
+                if (mesReponses.get(i).startsWith("/")) {
 
-                final ImageButton imgBtnTag = new ImageButton(this);
-                imgBtnTag.setLayoutParams(new LinearLayout.LayoutParams(300,300));
-                imgBtnTag.setAdjustViewBounds(true);
-                imgBtnTag.setId(i);
-                imgBtnTag.setImageBitmap(BitmapFactory.decodeFile(mesReponses.get(i)));
+                    final ImageButton imgBtnTag = new ImageButton(this);
+                    imgBtnTag.setLayoutParams(rowParamsImg);
+                    imgBtnTag.setId(i);
+                    Drawable d = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(mesReponses.get(i)));
+                    imgBtnTag.setBackground(d);
 
-                layoutProposition.addView(imgBtnTag);
-                imgBtnTag.setOnClickListener(myhandler1);
+                    if (i%2 == 0) {
+                        tableRow1.addView(imgBtnTag);
+                    } else {
+                        tableRow2.addView(imgBtnTag);
+                    }
 
-            } else {
+                    imgBtnTag.setOnClickListener(myhandler1);
 
-                final Button btnTag = new Button(this);
-                btnTag.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                btnTag.setId(i);
-                btnTag.setText(mesReponses.get(i));
-                layoutProposition.addView(btnTag);
-                btnTag.setOnClickListener(myhandler1);
+                } else {
+
+                    final Button btnTag = new Button(this);
+                    btnTag.setLayoutParams(rowParams);
+                    btnTag.setId(i);
+                    btnTag.setBackgroundColor(Color.parseColor("#0288D1"));
+                    btnTag.setTextColor(Color.parseColor("#ffffff"));
+                    btnTag.setText(mesReponses.get(i));
+
+                    if (i%2 == 0) {
+                        tableRow1.addView(btnTag);
+                    } else {
+                        tableRow2.addView(btnTag);
+                    }
+                    btnTag.setOnClickListener(myhandler1);
+                }
             }
+        } catch (IndexOutOfBoundsException e) {
+            Toast.makeText(QuizzActivity.this, "Ce quizz ne contient pas de questions !", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
 
+        layoutProposition.addView(tableRow1);
+        layoutProposition.addView(tableRow2);
     }
 
     View.OnClickListener myhandlerButtonNext = new View.OnClickListener() {
@@ -125,10 +161,14 @@ public class QuizzActivity extends MainActivity {
     View.OnClickListener myhandlerButtonVoirReponse = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(QuizzActivity.this, ShowAnswerActivity.class);
-            intent.putExtra("reponse", mesReponses.get(indiceReponse - 1));
-            startActivity(intent);
-            estAlleVoirReponse = true;
+            try {
+                Intent intent = new Intent(QuizzActivity.this, ShowAnswerActivity.class);
+                intent.putExtra("reponse", mesReponses.get(indiceReponse - 1));
+                startActivity(intent);
+                estAlleVoirReponse = true;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                Toast.makeText(QuizzActivity.this, "Ce quizz ne contient pas de questions !", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -138,18 +178,16 @@ public class QuizzActivity extends MainActivity {
             if (verifieReponse(v.getId() + 1, indiceReponse)) {
                 if (estAlleVoirReponse) {
                     Toast.makeText(QuizzActivity.this, "VOUS AVEZ TRICHÉ !", Toast.LENGTH_SHORT).show();
-                    scoreJeu-=2;
+                    if (scoreJeu > 0) { scoreJeu-=1; }
                     score.setText(String.valueOf(scoreJeu));
                     estAlleVoirReponse = false;
                 } else {
                     Toast.makeText(QuizzActivity.this, "CORRECT !", Toast.LENGTH_SHORT).show();
-                    scoreJeu+=4;
+                    scoreJeu+=1;
                     score.setText(String.valueOf(scoreJeu));
                 }
             } else {
                 Toast.makeText(QuizzActivity.this, "MAUVAISE REPONSE !", Toast.LENGTH_SHORT).show();
-                scoreJeu-=1;
-                score.setText(String.valueOf(scoreJeu));
             }
             indiceQuestion+=2;
             if (indiceQuestion >= mesQuestions.size()) {
@@ -173,10 +211,17 @@ public class QuizzActivity extends MainActivity {
         final Button btnRetourQuizz = new Button(this);
         final TextView scoreFinQuizz = new TextView(this);
         scoreFinQuizz.setTextSize(50);
+        scoreFinQuizz.setTextColor(Color.parseColor("#009688"));
+
+        btnRejouer.setBackgroundColor(Color.parseColor("#0288D1"));
+        btnRejouer.setTextColor(Color.parseColor("#ffffff"));
+
+        btnRetourQuizz.setBackgroundColor(Color.parseColor("#03A9F4"));
+        btnRetourQuizz.setTextColor(Color.parseColor("#ffffff"));
 
         btnRejouer.setText("Rejouer");
         btnRetourQuizz.setText("Retour aux quizzs");
-        scoreFinQuizz.setText("Vous avez un score de : " + scoreJeu);
+        scoreFinQuizz.setText("Score de : " + scoreJeu + " sur " + mesQuestions.size());
 
         btnRejouer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         btnRetourQuizz.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -184,7 +229,7 @@ public class QuizzActivity extends MainActivity {
 
         layoutQuestion.addView(btnRejouer);
         layoutQuestion.addView(btnRetourQuizz);
-        layoutQuestion.addView(scoreFinQuizz);
+        layoutProposition.addView(scoreFinQuizz);
 
         btnRejouer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
