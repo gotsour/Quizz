@@ -221,7 +221,7 @@ public class QuizzActivity extends MainActivity {
 
         btnRejouer.setText("Rejouer");
         btnRetourQuizz.setText("Retour aux quizzs");
-        scoreFinQuizz.setText("Score de : " + scoreJeu + " sur " + mesQuestions.size());
+        scoreFinQuizz.setText("Score de : " + scoreJeu + " sur " + mesQuestions.size()/2);
 
         btnRejouer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         btnRetourQuizz.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));

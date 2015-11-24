@@ -58,8 +58,9 @@
             android:id="@+id/buttonVoirReponse"
             android:layout_alignParentBottom="true"
             android:layout_alignEnd="@+id/buttonNext"
-            android:backgroundTint="#3F51B5"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:background="#3F51B5"
+            android:padding="5dp" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -69,8 +70,9 @@
             android:id="@+id/buttonNext"
             android:layout_alignTop="@+id/buttonVoirReponse"
             android:layout_alignEnd="@+id/linearLayout3"
-            android:backgroundTint="#009688"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:background="#009688"
+            android:layout_marginLeft="20dp" />
 
     </LinearLayout>
 
@@ -80,11 +82,11 @@
         android:layout_height="match_parent"
         android:layout_toEndOf="@+id/linearLayoutButton"
         android:id="@+id/linearLayoutScore"
-        android:layout_below="@+id/linearLayoutQuestion">
+        android:layout_alignTop="@+id/linearLayoutButton">
 
         <TextView
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="96dp"
             android:text="0"
             android:id="@+id/textViewScore"
             android:layout_gravity="bottom"

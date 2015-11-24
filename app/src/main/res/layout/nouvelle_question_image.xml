@@ -84,8 +84,8 @@
             android:layout_height="wrap_content"
             android:text="Ajouter question"
             android:id="@+id/buttonAjout"
-            android:backgroundTint="#009688"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:background="#009688" />
     </LinearLayout>
 
 </LinearLayout>

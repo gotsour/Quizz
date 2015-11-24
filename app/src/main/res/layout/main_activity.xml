@@ -21,8 +21,8 @@
             android:id="@+id/buttonJouer"
             android:layout_gravity="center_horizontal|top"
             android:textSize="@dimen/abc_text_size_large_material"
-            android:backgroundTint="#303F9F"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:background="#303F9F" />
 
         <Button
             android:layout_width="match_parent"
@@ -31,8 +31,8 @@
             android:id="@+id/buttonParametrer"
             android:layout_gravity="center"
             android:textSize="@dimen/abc_text_size_large_material"
-            android:backgroundTint="#3F51B5"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:background="#3F51B5" />
 
         <Button
             android:layout_width="match_parent"
