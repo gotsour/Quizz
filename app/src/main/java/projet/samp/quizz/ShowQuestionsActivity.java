@@ -77,176 +77,190 @@ public class ShowQuestionsActivity extends MainActivity {
     AdapterView.OnItemClickListener modifierQuestion = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-            // get prompts.xml view
-            LayoutInflater li = LayoutInflater.from(ShowQuestionsActivity.this);
-            View promptsView = li.inflate(R.layout.nouvelle_question, null);
-
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowQuestionsActivity.this);
-
-            // set prompts.xml to alertdialog builder
-            alertDialogBuilder.setView(promptsView);
-
-            final EditText questionTexte = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
-            final EditText propositionTexte1 = (EditText) promptsView.findViewById(R.id.editTextProposition1);
-            final EditText propositionTexte2 = (EditText) promptsView.findViewById(R.id.editTextProposition2);
-            final EditText propositionTexte3 = (EditText) promptsView.findViewById(R.id.editTextProposition3);
-            final EditText propositionTexte4 = (EditText) promptsView.findViewById(R.id.editTextProposition4);
-            final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);
-
 
             TextView c = (TextView) view.findViewById(android.R.id.text1);
             /* On sauvegarde le texte de la question */
             final String questionTexteSave = c.getText().toString();
-            questionTexte.setText(questionTexteSave);
-
-
             final int id_question = database.getIdQuestion(questionTexteSave);
             List<String> listProposition = new ArrayList<>();
             database.chargerLesReponses(listProposition, id_question);
-            String propositionTexte1Save = null;
-            String propositionTexte2Save = null;
-            String propositionTexte3Save = null;
-            String propositionTexte4Save = null;
-
-            if (listProposition.size() >= 1) {
-                propositionTexte1.setText(listProposition.get(0));
-                propositionTexte1Save = listProposition.get(0);
-            }
-            if (listProposition.size() >= 2) {
-                propositionTexte2.setText(listProposition.get(1));
-                propositionTexte2Save = listProposition.get(1);
-            }
-            if (listProposition.size() >= 3) {
-                propositionTexte3.setText(listProposition.get(2));
-                propositionTexte3Save = listProposition.get(2);
-            }
-            if (listProposition.size() >= 4) {
-                propositionTexte4.setText(listProposition.get(3));
-                propositionTexte4Save = listProposition.get(3);
-            }
-
             final int id_reponseSave = database.getIndiceReponse(id_question);
-            indiceReponse.setText(String.valueOf(id_reponseSave));
+
+            if (listProposition.get(0).startsWith("/")) {
+                Intent intent = new Intent(ShowQuestionsActivity.this, EditImageQuestionActivity.class);
+                intent.putExtra("quizzNumber", quizzNumber);
+                intent.putExtra("texteQuestion", questionTexteSave);
+                intent.putExtra("reponse1", listProposition.get(0));
+                intent.putExtra("reponse2", listProposition.get(1));
+                intent.putExtra("reponse3", listProposition.get(2));
+                intent.putExtra("reponse4", listProposition.get(3));
+                intent.putExtra("numeroReponse", id_reponseSave);
+
+                startActivity(intent);
+                finish();
+            } else {
+
+                // get prompts.xml view
+                LayoutInflater li = LayoutInflater.from(ShowQuestionsActivity.this);
+                View promptsView = li.inflate(R.layout.nouvelle_question, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowQuestionsActivity.this);
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
+
+                final EditText questionTexte = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
+                final EditText propositionTexte1 = (EditText) promptsView.findViewById(R.id.editTextProposition1);
+                final EditText propositionTexte2 = (EditText) promptsView.findViewById(R.id.editTextProposition2);
+                final EditText propositionTexte3 = (EditText) promptsView.findViewById(R.id.editTextProposition3);
+                final EditText propositionTexte4 = (EditText) promptsView.findViewById(R.id.editTextProposition4);
+                final EditText indiceReponse = (EditText) promptsView.findViewById(R.id.editTextIndiceReponse);
+
+                questionTexte.setText(questionTexteSave);
+                String propositionTexte1Save = null;
+                String propositionTexte2Save = null;
+                String propositionTexte3Save = null;
+                String propositionTexte4Save = null;
+
+                if (listProposition.size() >= 1) {
+                    propositionTexte1.setText(listProposition.get(0));
+                    propositionTexte1Save = listProposition.get(0);
+                }
+                if (listProposition.size() >= 2) {
+                    propositionTexte2.setText(listProposition.get(1));
+                    propositionTexte2Save = listProposition.get(1);
+                }
+                if (listProposition.size() >= 3) {
+                    propositionTexte3.setText(listProposition.get(2));
+                    propositionTexte3Save = listProposition.get(2);
+                }
+                if (listProposition.size() >= 4) {
+                    propositionTexte4.setText(listProposition.get(3));
+                    propositionTexte4Save = listProposition.get(3);
+                }
+
+                indiceReponse.setText(String.valueOf(id_reponseSave));
 
 
-            // set dialog message
-            final String finalPropositionTexte1Save = propositionTexte1Save;
-            final String finalPropositionTexte2Save = propositionTexte2Save;
-            final String finalPropositionTexte3Save = propositionTexte3Save;
-            final String finalPropositionTexte4Save = propositionTexte4Save;
-            alertDialogBuilder
-                    .setCancelable(false)
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
+                // set dialog message
+                final String finalPropositionTexte1Save = propositionTexte1Save;
+                final String finalPropositionTexte2Save = propositionTexte2Save;
+                final String finalPropositionTexte3Save = propositionTexte3Save;
+                final String finalPropositionTexte4Save = propositionTexte4Save;
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
 
 
-                                    if (!questionTexte.getText().toString().equals("") && !questionTexte.getText().toString().equals(questionTexteSave) || !indiceReponse.getText().toString().equals("") && Integer.parseInt(indiceReponse.getText().toString()) != id_reponseSave) {
+                                        if (!questionTexte.getText().toString().equals("") && !questionTexte.getText().toString().equals(questionTexteSave) || !indiceReponse.getText().toString().equals("") && Integer.parseInt(indiceReponse.getText().toString()) != id_reponseSave) {
 
-                                        if (!indiceReponse.getText().toString().equals("") && Integer.parseInt(indiceReponse.getText().toString()) != id_reponseSave) {
+                                            if (!indiceReponse.getText().toString().equals("") && Integer.parseInt(indiceReponse.getText().toString()) != id_reponseSave) {
 
                                             /* On update questionTexte et indiceQuestion */
-                                            questionDB.updateQuestion(id_question, questionTexte.getText().toString());
-                                            questionDB.updateIndiceReponse(id_question, Integer.parseInt(indiceReponse.getText().toString()));
-                                        } else {
+                                                questionDB.updateQuestion(id_question, questionTexte.getText().toString());
+                                                questionDB.updateIndiceReponse(id_question, Integer.parseInt(indiceReponse.getText().toString()));
+                                            } else {
                                             /* On update questionTexte */
-                                            questionDB.updateQuestion(id_question, questionTexte.getText().toString());
+                                                questionDB.updateQuestion(id_question, questionTexte.getText().toString());
+                                            }
+
+                                            mesQuestions.set(position, questionTexte.getText().toString());
+                                            adapter.notifyDataSetChanged();
                                         }
 
-                                        mesQuestions.set(position, questionTexte.getText().toString());
-                                        adapter.notifyDataSetChanged();
-                                    }
-
-                                    int nextPropositionId = questionDB.getNextId("proposition");
-                                    if (!propositionTexte1.getText().toString().equals("")) {
-                                        if (!propositionTexte1.getText().toString().equals(finalPropositionTexte1Save)) {
-                                            if (finalPropositionTexte1Save == null) {
+                                        int nextPropositionId = questionDB.getNextId("proposition");
+                                        if (!propositionTexte1.getText().toString().equals("")) {
+                                            if (!propositionTexte1.getText().toString().equals(finalPropositionTexte1Save)) {
+                                                if (finalPropositionTexte1Save == null) {
                                                 /* On créér une nouvelle proposition */
-                                                questionDB.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), id_question);
-                                            } else {
+                                                    questionDB.creerProposition(nextPropositionId, propositionTexte1.getText().toString(), id_question);
+                                                } else {
                                             /* On update la proposition 1*/
-                                                questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte1Save, id_question), propositionTexte1.getText().toString());
+                                                    questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte1Save, id_question), propositionTexte1.getText().toString());
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        if (finalPropositionTexte1Save != null) {
+                                        } else {
+                                            if (finalPropositionTexte1Save != null) {
                                             /* On supprime la proposition 1 */
-                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte1Save, id_question));
+                                                questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte1Save, id_question));
+                                            }
                                         }
-                                    }
 
-                                    if (!propositionTexte2.getText().toString().equals("")) {
-                                        if (!propositionTexte2.getText().toString().equals(finalPropositionTexte2Save)) {
-                                            if (finalPropositionTexte2Save == null) {
+                                        if (!propositionTexte2.getText().toString().equals("")) {
+                                            if (!propositionTexte2.getText().toString().equals(finalPropositionTexte2Save)) {
+                                                if (finalPropositionTexte2Save == null) {
                                                 /* On créér une nouvelle proposition */
-                                                nextPropositionId++;
-                                                questionDB.creerProposition(nextPropositionId, propositionTexte2.getText().toString(), id_question);
-                                            } else {
+                                                    nextPropositionId++;
+                                                    questionDB.creerProposition(nextPropositionId, propositionTexte2.getText().toString(), id_question);
+                                                } else {
                                             /* On update la proposition 2 */
-                                                questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte2Save, id_question), propositionTexte2.getText().toString());
+                                                    questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte2Save, id_question), propositionTexte2.getText().toString());
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        if (finalPropositionTexte2Save != null) {
+                                        } else {
+                                            if (finalPropositionTexte2Save != null) {
                                             /* On supprime la proposition 2 */
-                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte2Save, id_question));
+                                                questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte2Save, id_question));
+                                            }
                                         }
-                                    }
 
-                                    if (!propositionTexte3.getText().toString().equals("")) {
-                                        if (!propositionTexte3.getText().toString().equals(finalPropositionTexte3Save)) {
-                                            if (finalPropositionTexte3Save == null) {
+                                        if (!propositionTexte3.getText().toString().equals("")) {
+                                            if (!propositionTexte3.getText().toString().equals(finalPropositionTexte3Save)) {
+                                                if (finalPropositionTexte3Save == null) {
                                                 /* On créér une nouvelle proposition */
-                                                nextPropositionId++;
-                                                questionDB.creerProposition(nextPropositionId, propositionTexte3.getText().toString(), id_question);
-                                            } else {
+                                                    nextPropositionId++;
+                                                    questionDB.creerProposition(nextPropositionId, propositionTexte3.getText().toString(), id_question);
+                                                } else {
                                                 /* On update la proposition 3 */
-                                                questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question), propositionTexte3.getText().toString());
+                                                    questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question), propositionTexte3.getText().toString());
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        if (finalPropositionTexte3Save != null) {
+                                        } else {
+                                            if (finalPropositionTexte3Save != null) {
                                             /* On supprime la proposition 3 */
-                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question));
-                                        }
-                                    }
-
-                                    if (!propositionTexte4.getText().toString().equals("")) {
-                                        if (!propositionTexte4.getText().toString().equals(finalPropositionTexte4Save)) {
-                                            if (finalPropositionTexte4Save == null) {
-                                                nextPropositionId++;
-                                                /* On créér une nouvelle proposition */
-                                                questionDB.creerProposition(nextPropositionId, propositionTexte4.getText().toString(), id_question);
-                                            } else {
-                                            /* On update la proposition 4*/
-                                                questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte4Save, id_question), propositionTexte4.getText().toString());
+                                                questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte3Save, id_question));
                                             }
                                         }
-                                    } else {
-                                        if (finalPropositionTexte4Save != null) {
+
+                                        if (!propositionTexte4.getText().toString().equals("")) {
+                                            if (!propositionTexte4.getText().toString().equals(finalPropositionTexte4Save)) {
+                                                if (finalPropositionTexte4Save == null) {
+                                                    nextPropositionId++;
+                                                /* On créér une nouvelle proposition */
+                                                    questionDB.creerProposition(nextPropositionId, propositionTexte4.getText().toString(), id_question);
+                                                } else {
+                                            /* On update la proposition 4*/
+                                                    questionDB.updateProposition(questionDB.getIdProposition(finalPropositionTexte4Save, id_question), propositionTexte4.getText().toString());
+                                                }
+                                            }
+                                        } else {
+                                            if (finalPropositionTexte4Save != null) {
                                             /* On supprime la proposition 4 */
-                                            questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte4Save, id_question));
+                                                questionDB.supprimerProposition(questionDB.getIdProposition(finalPropositionTexte4Save, id_question));
+                                            }
+
                                         }
 
+
                                     }
-
-
                                 }
-                            }
 
-                    )
-                    .setNegativeButton("Annuler",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
+                        )
+                        .setNegativeButton("Annuler",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
                                 }
-                            }
-                    );
+                        );
 
-            // create alert dialog
-            AlertDialog alertDialog = alertDialogBuilder.create();
-                                // show it
-            alertDialog.show();
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                // show it
+                alertDialog.show();
+            }
         }
     };
 

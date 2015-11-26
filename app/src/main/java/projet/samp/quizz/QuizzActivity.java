@@ -79,14 +79,21 @@ public class QuizzActivity extends MainActivity {
 
         TableRow tableRow1 = new TableRow(this);
         TableRow tableRow2 = new TableRow(this);
+
+        TableRow tableRow3 = new TableRow(this);
+        TableRow tableRow4 = new TableRow(this);
+
         TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
         TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams rowParamsImg = new TableRow.LayoutParams(300, 300);
+        TableRow.LayoutParams rowParamsImg = new TableRow.LayoutParams(450 , 450);
         rowParams.setMargins(10,10,10,10);
         rowParamsImg.setMargins(10,10,10,10);
 
         tableRow1.setLayoutParams(tableParams);
         tableRow2.setLayoutParams(tableParams);
+
+        tableRow3.setLayoutParams(tableParams);
+        tableRow4.setLayoutParams(tableParams);
 
         mesReponses = new ArrayList<>();
 
@@ -132,11 +139,16 @@ public class QuizzActivity extends MainActivity {
                     btnTag.setTextColor(Color.parseColor("#ffffff"));
                     btnTag.setText(mesReponses.get(i));
 
-                    if (i%2 == 0) {
+                    if (i == 0) {
                         tableRow1.addView(btnTag);
-                    } else {
+                    } else if (i == 1) {
                         tableRow2.addView(btnTag);
+                    }else if (i == 2) {
+                        tableRow3.addView(btnTag);
+                    }else if (i == 3) {
+                        tableRow4.addView(btnTag);
                     }
+
                     btnTag.setOnClickListener(myhandler1);
                 }
             }
@@ -147,6 +159,11 @@ public class QuizzActivity extends MainActivity {
 
         layoutProposition.addView(tableRow1);
         layoutProposition.addView(tableRow2);
+
+        if (!imageQuestion) {
+            layoutProposition.addView(tableRow3);
+            layoutProposition.addView(tableRow4);
+        }
     }
 
     View.OnClickListener myhandlerButtonNext = new View.OnClickListener() {

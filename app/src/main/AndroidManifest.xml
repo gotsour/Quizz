@@ -44,6 +44,11 @@ package="projet.samp.quizz" >
         android:label="@string/app_name" >
     </activity>
 
+    <activity
+        android:name=".EditImageQuestionActivity"
+        android:label="@string/app_name" >
+    </activity>
+
 </application>
 
 </manifest>
