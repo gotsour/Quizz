@@ -10,23 +10,13 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal">
 
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="Voir réponse"
-            android:id="@+id/buttonConfirmShowReponse"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="#ffffff"
-            android:background="#3F51B5" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/buttonConfirmShowReponse"
             android:layout_alignParentStart="true"
-            android:id="@+id/layoutVoirReponse">
+            android:id="@+id/layoutVoirReponse"
+            android:layout_centerVertical="true">
 
             <TextView
                 android:layout_width="wrap_content"

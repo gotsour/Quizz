@@ -27,24 +27,19 @@ public class ShowAnswerActivity extends MainActivity {
         final boolean imageQuestion = intent.getBooleanExtra("imageQuestion", false);
 
         layoutReponse = (LinearLayout) findViewById(R.id.layoutVoirReponse);
-        Button buttonConfirm = (Button) findViewById(R.id.buttonConfirmShowReponse);
         final TextView reponse = (TextView) findViewById(R.id.textViewReponse);
 
-        buttonConfirm.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (imageQuestion) {
-                    final ImageView img = new ImageView(ShowAnswerActivity.this);
-                    LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(300, 300);
-                    layoutParams.gravity=Gravity.CENTER_HORIZONTAL;
-                    img.setLayoutParams(layoutParams);
-                    Drawable d = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(value));
-                    img.setBackground(d);
-                    layoutReponse.addView(img);
-                } else {
-                    reponse.setText(value);
-                }
-            }
-        });
+        if (imageQuestion) {
+            final ImageView img = new ImageView(ShowAnswerActivity.this);
+            LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(300, 300);
+            layoutParams.gravity=Gravity.CENTER_HORIZONTAL;
+            img.setLayoutParams(layoutParams);
+            Drawable d = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(value));
+            img.setBackground(d);
+            layoutReponse.addView(img);
+        } else {
+            reponse.setText(value);
+        }
 
     }
 
