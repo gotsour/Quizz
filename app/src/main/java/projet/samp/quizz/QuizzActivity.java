@@ -38,6 +38,7 @@ public class QuizzActivity extends MainActivity {
     Button buttonNext;
     Button buttonVoirReponse;
     int quizzNumber;
+    boolean imageQuestion = false;
 
 
     private int scoreJeu = 0;
@@ -104,6 +105,8 @@ public class QuizzActivity extends MainActivity {
                 // Permet de détecter si on a une image ou pas
                 if (mesReponses.get(i).startsWith("/")) {
 
+                    imageQuestion = true;
+
                     final ImageButton imgBtnTag = new ImageButton(this);
                     imgBtnTag.setLayoutParams(rowParamsImg);
                     imgBtnTag.setId(i);
@@ -119,6 +122,8 @@ public class QuizzActivity extends MainActivity {
                     imgBtnTag.setOnClickListener(myhandler1);
 
                 } else {
+
+                    imageQuestion = false;
 
                     final Button btnTag = new Button(this);
                     btnTag.setLayoutParams(rowParams);
@@ -164,6 +169,7 @@ public class QuizzActivity extends MainActivity {
             try {
                 Intent intent = new Intent(QuizzActivity.this, ShowAnswerActivity.class);
                 intent.putExtra("reponse", mesReponses.get(indiceReponse - 1));
+                intent.putExtra("imageQuestion", imageQuestion);
                 startActivity(intent);
                 estAlleVoirReponse = true;
             } catch (ArrayIndexOutOfBoundsException e) {
