@@ -13,6 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+/*
+ * Activité qui permet de modifier une question
+ * ave des images en guise de propositions
+ */
 
 public class EditImageQuestionActivity extends MainActivity {
     private static final int PICK_IMAGE_1 = 1;
@@ -45,9 +49,10 @@ public class EditImageQuestionActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nouvelle_question_image);
 
-        /* On récupère l'id du quizz renvoyé par l'instance qui a généré cette activité */
+        // On récupère l'id du quizz renvoyé par l'instance qui a généré cette activité
         Intent intent = getIntent();
         quizzNumber = intent.getIntExtra("quizzNumber", 0);
+        // On récupère les données de la questions
         questionTexteSave = intent.getStringExtra("texteQuestion");
         picturePathSave1 = intent.getStringExtra("reponse1");
         picturePathSave2 = intent.getStringExtra("reponse2");
@@ -74,19 +79,27 @@ public class EditImageQuestionActivity extends MainActivity {
         picturePath3 = null;
         picturePath4 = null;
 
-
+        // On affiche dans nos champs texte et nos button la question, les images et l'indice de réponse
         questionTexte.setText(questionTexteSave);
-        Drawable d = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave1));
-        image1.setBackground(d);
+        if (picturePathSave1 != null) {
+            Drawable d = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave1));
+            image1.setBackground(d);
+        }
 
-        Drawable d1 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave2));
-        image2.setBackground(d1);
+        if (picturePathSave2 != null) {
+            Drawable d1 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave2));
+            image2.setBackground(d1);
+        }
 
-        Drawable d2 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave3));
-        image3.setBackground(d2);
+        if (picturePathSave3 != null) {
+            Drawable d2 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave3));
+            image3.setBackground(d2);
+        }
 
-        Drawable d3 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave4));
-        image4.setBackground(d3);
+        if (picturePathSave4 != null) {
+            Drawable d3 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePathSave4));
+            image4.setBackground(d3);
+        }
 
         reponseTexte.setText(reponseTexteSave);
 
@@ -98,6 +111,8 @@ public class EditImageQuestionActivity extends MainActivity {
 
     }
 
+    /* Méthode qui récupère le résultat de l'image envoyée par la gallerie et se
+     * charge d'updater la base de données */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -115,30 +130,53 @@ public class EditImageQuestionActivity extends MainActivity {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
 
+            // En fonction de la méthode et donc de l'image sur laquelle on a appuyé
             switch (requestCode) {
                 case PICK_IMAGE_1:
                     picturePath1 = picturePath;
+                    // On insère la nouvelle image dans le button
                     Drawable d = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePath1));
                     image1.setBackground(d);
-                    questionDB.updateProposition(questionDB.getIdProposition(picturePathSave1, id_question), picturePath1);
+                    // On update notre proposition dans la base de données
+                    if (picturePathSave1 != null) {
+                        questionDB.updateProposition(questionDB.getIdProposition(picturePathSave1, id_question), picturePath1);
+                    } else {
+                        int next_id = questionDB.getNextId("proposition");
+                        questionDB.creerProposition(next_id, picturePath1, id_question);
+                    }
                     break;
                 case PICK_IMAGE_2:
                     picturePath2 = picturePath;
                     Drawable d2 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePath2));
                     image2.setBackground(d2);
-                    questionDB.updateProposition(questionDB.getIdProposition(picturePathSave2, id_question), picturePath2);
+                    if (picturePathSave2 != null) {
+                        questionDB.updateProposition(questionDB.getIdProposition(picturePathSave2, id_question), picturePath2);
+                    } else {
+                        int next_id = questionDB.getNextId("proposition");
+                        questionDB.creerProposition(next_id, picturePath2, id_question);
+                    }
                     break;
                 case PICK_IMAGE_3:
                     picturePath3 = picturePath;
                     Drawable d3 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePath3));
                     image3.setBackground(d3);
-                    questionDB.updateProposition(questionDB.getIdProposition(picturePathSave3, id_question), picturePath3);
+                    if (picturePathSave3 != null) {
+                        questionDB.updateProposition(questionDB.getIdProposition(picturePathSave3, id_question), picturePath3);
+                    } else {
+                        int next_id = questionDB.getNextId("proposition");
+                        questionDB.creerProposition(next_id, picturePath3, id_question);
+                    }
                     break;
                 case PICK_IMAGE_4:
                     picturePath4 = picturePath;
                     Drawable d4 = new BitmapDrawable(getResources(), BitmapFactory.decodeFile(picturePath4));
                     image4.setBackground(d4);
-                    questionDB.updateProposition(questionDB.getIdProposition(picturePathSave4, id_question), picturePath4);
+                    if (picturePathSave4 != null) {
+                        questionDB.updateProposition(questionDB.getIdProposition(picturePathSave4, id_question), picturePath4);
+                    } else {
+                        int next_id = questionDB.getNextId("proposition");
+                        questionDB.creerProposition(next_id, picturePath4, id_question);
+                    }
                     break;
             }
 
@@ -147,6 +185,7 @@ public class EditImageQuestionActivity extends MainActivity {
 
     }
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 1 */
     View.OnClickListener chercheImage1 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -157,6 +196,7 @@ public class EditImageQuestionActivity extends MainActivity {
         }
     };
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 2 */
     View.OnClickListener chercheImage2 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -167,6 +207,7 @@ public class EditImageQuestionActivity extends MainActivity {
         }
     };
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image  3*/
     View.OnClickListener chercheImage3 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -177,6 +218,7 @@ public class EditImageQuestionActivity extends MainActivity {
         }
     };
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 4 */
     View.OnClickListener chercheImage4 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -187,12 +229,12 @@ public class EditImageQuestionActivity extends MainActivity {
         }
     };
 
+    /* Méthode qui permet de terminer la modification de la question */
     View.OnClickListener ajouterQuestion = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             if (!questionTexte.getText().toString().equals("") && !questionTexte.getText().toString().equals(questionTexteSave) || !reponseTexte.getText().toString().equals("") && !reponseTexte.getText().toString().equals(reponseTexteSave)) {
-
                 if (!reponseTexte.getText().toString().equals("") && !reponseTexte.getText().toString().equals(reponseTexteSave)) {
                 /* On update questionTexte et indiceQuestion */
                     questionDB.updateQuestion(id_question, questionTexte.getText().toString());
@@ -203,9 +245,11 @@ public class EditImageQuestionActivity extends MainActivity {
                 }
             }
 
+            // On retourne à l'activité qui affiche les questions d'un quizz
             Intent intent = new Intent(EditImageQuestionActivity.this, ShowQuestionsActivity.class);
             intent.putExtra("quizzNumber", quizzNumber);
             startActivity(intent);
+            // On termine notre activité
             finish();
         }
     };

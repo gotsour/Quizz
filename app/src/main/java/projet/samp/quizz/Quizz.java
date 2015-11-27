@@ -2,6 +2,10 @@ package projet.samp.quizz;
 
 import java.util.ArrayList;
 
+/**
+ * Classe qui gère les quizz
+ */
+
 public class Quizz {
     public ArrayList<Question> questionList;
     String quizzName;

@@ -15,6 +15,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Activité qui affiche les quizz
+ */
 
 public class SelectQuizzActivity extends MainActivity {
 
@@ -27,19 +30,22 @@ public class SelectQuizzActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_quizz);
 
+        // Initialisation du FAB
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         floatingActionButton.hide();
 
         questionDB = new QuestionDataBase(this);
+        // On charges les quizz
         questionDB.chargerLesQuizz(mesQuizz);
 
         Intent intent = getIntent();
+        // On rcupère l'action qui est soit Edit soit Play
+        // Permet de savoir si on ouvre l'activité pour jouer au quizz ou pour les editer
         final String action = intent.getStringExtra("STATE");
 
         final ListView listQuizz = (ListView) findViewById(R.id.listViewSelectQuizz);
 
-        /* Adapter qui permet de charger la listview avec la qestion et la reponse en subItem */
-
+        /* Adapter qui permet de charger la listview avec les quizz en Item */
         String[] from = new String[] { "quizzName" };
         int[] to = new int[] { android.R.id.text1};
         adapter = new SimpleAdapter(this, mesQuizz, android.R.layout.simple_list_item_1, from, to);
@@ -48,14 +54,18 @@ public class SelectQuizzActivity extends MainActivity {
         listQuizz.setAdapter(adapter);
 
 
+        // Si l'utilisateur désire modifier les quizz
         if (action.equals("edit")) {
+            // On affiche le FAB
             floatingActionButton.show();
             floatingActionButton.setOnClickListener(myhandler1);
 
+            // Si l'utilisateur reste appuyé sur le nom d'un quizz
             listQuizz.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> arg0, View arg1, final int pos, long id) {
 
+                    // On affiche une fenêtre flotante lui demandant de confirmer la suppression
                     TextView c = (TextView) arg1.findViewById(android.R.id.text1);
                     final String quizzName = c.getText().toString();
 
@@ -64,19 +74,23 @@ public class SelectQuizzActivity extends MainActivity {
                     alert.setTitle("Suppression Quizz");
                     alert.setMessage("Etes vous sûr de supprimer ce quizz ?");
 
-
+                    // Si il clique sur OK
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
 
+                            // On supprimer le quizz de la base de données (Opération qui supprime aussi les
+                            // questions et les réponses assosicées
                             questionDB.supprimerQuizz(quizzName);
+                            // On supprimer le quizz de la listView
                             mesQuizz.remove(pos);
                             adapter.notifyDataSetChanged();
                         }
                     });
 
-                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    // Si il clique sur Annuler
+                    alert.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            // Canceled.
+                            //La fenêtre se ferme
                         }
                     });
 
@@ -95,6 +109,7 @@ public class SelectQuizzActivity extends MainActivity {
 
                 TextView c = (TextView) view.findViewById(android.R.id.text1);
                 String quizzName = c.getText().toString();
+                // On récupère l'id du quizz
                 int id_quizz = questionDB.getQuizzId(quizzName);
 
                 if (action.equals("play")) {
@@ -118,6 +133,7 @@ public class SelectQuizzActivity extends MainActivity {
 
     }
 
+    // Quand clique sur le FAB pour ajouter un quizz
     View.OnClickListener myhandler1 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -134,6 +150,7 @@ public class SelectQuizzActivity extends MainActivity {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String txt = input.getText().toString();
 
+                    // ON insère le quizz dans la base de données
                     QuestionDataBase dataBase = new QuestionDataBase(SelectQuizzActivity.this);
                     int nextQuizzId = database.getNextId("quizz");
                     dataBase.creerQuizz(nextQuizzId, txt);

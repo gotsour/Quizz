@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Classe qui gère la base de données
+ */
+
 public class QuestionDataBase extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_TABLE_QUIZZ = "create table quizz (id_quizz integer primary key autoincrement, quizzName text not null);";
     private static final String DATABASE_CREATE_TABLE_QUESTION = "create table question (id_question integer primary key autoincrement, texteQuestion text not null, id_quizz integer not null, id_reponse integer not null);";
@@ -23,16 +27,19 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /* Récupère les questions pour un quizz donné */
     public Cursor getCursorForQuestion(int quizzNumber) {
         this.db = getWritableDatabase();
         return this.db.rawQuery("SELECT id_question, texteQuestion FROM question WHERE id_quizz="+quizzNumber, null);
     }
 
+    /* Récupère les quizz */
     public Cursor getCursorForQuizz() {
         this.db = getWritableDatabase();
         return this.db.rawQuery("SELECT * FROM quizz", null);
     }
 
+    /* Récupère les propositions pour une question donnée */
     public Cursor getCursorForProposition(int questionNumber) {
         this.db = getWritableDatabase();
         return this.db.rawQuery("SELECT * FROM proposition where id_question="+questionNumber, null);
@@ -40,6 +47,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase database) {
         this.db = database;
+        // Création de la base
         database.execSQL(DATABASE_CREATE_TABLE_QUIZZ);
         database.execSQL(DATABASE_CREATE_TABLE_QUESTION);
         database.execSQL(DATABASE_CREATE_TABLE_PROPOSITION);
@@ -279,7 +287,5 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     public boolean supprimerProposition(int id_proposition) {
         return this.db.delete("proposition", "id_proposition = ?", new String[] {String.valueOf(id_proposition)}) > 0;
     }
-
-
 
 }

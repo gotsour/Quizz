@@ -1,5 +1,9 @@
 package projet.samp.quizz;
 
+/**
+ * Classe qui gère les propositions
+ */
+
 public class Proposition {
 
     private String proposition;

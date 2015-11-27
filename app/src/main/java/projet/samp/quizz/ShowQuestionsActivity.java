@@ -23,6 +23,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activité qui présente les questions à un quizz
+ */
 
 public class ShowQuestionsActivity extends MainActivity {
 
@@ -32,7 +35,6 @@ public class ShowQuestionsActivity extends MainActivity {
     QuestionDataBase questionDB ;
     int quizzNumber;
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +76,7 @@ public class ShowQuestionsActivity extends MainActivity {
     }
 
 
+    // Si clique sur une question en vue de la modifier
     AdapterView.OnItemClickListener modifierQuestion = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -86,21 +89,30 @@ public class ShowQuestionsActivity extends MainActivity {
             database.chargerLesReponses(listProposition, id_question);
             final int id_reponseSave = database.getIndiceReponse(id_question);
 
+            // On regarde si c'est une question Image
             if (listProposition.get(0).startsWith("/")) {
+                // On appelle l'activité qui gère l'édition d'une question image avec les données de la question
                 Intent intent = new Intent(ShowQuestionsActivity.this, EditImageQuestionActivity.class);
                 intent.putExtra("quizzNumber", quizzNumber);
                 intent.putExtra("texteQuestion", questionTexteSave);
-                intent.putExtra("reponse1", listProposition.get(0));
-                intent.putExtra("reponse2", listProposition.get(1));
-                intent.putExtra("reponse3", listProposition.get(2));
-                intent.putExtra("reponse4", listProposition.get(3));
+                try {
+                    intent.putExtra("reponse1", listProposition.get(0));
+                }catch (IndexOutOfBoundsException e) {}
+                try {
+                    intent.putExtra("reponse2", listProposition.get(1));
+                } catch (IndexOutOfBoundsException e) {}
+                try {
+                    intent.putExtra("reponse3", listProposition.get(2));
+                } catch (IndexOutOfBoundsException e) {}
+                try {
+                    intent.putExtra("reponse4", listProposition.get(3));
+                } catch (IndexOutOfBoundsException e) {}
                 intent.putExtra("numeroReponse", id_reponseSave);
 
                 startActivity(intent);
                 finish();
             } else {
-
-                // get prompts.xml view
+                // Sinon on affiche une fenêtre flottante
                 LayoutInflater li = LayoutInflater.from(ShowQuestionsActivity.this);
                 View promptsView = li.inflate(R.layout.nouvelle_question, null);
 
@@ -296,6 +308,7 @@ public class ShowQuestionsActivity extends MainActivity {
         }
     };
 
+    // Si l'utilisateur clique sur le FAB pour ajouter une question texte
     View.OnClickListener ajouterQuestionTexte = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -383,7 +396,7 @@ public class ShowQuestionsActivity extends MainActivity {
 
     };
 
-
+    // Si l'utilsateur clique sur le FAB pour ajouter une question image
     View.OnClickListener ajouterQuestionImage = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

@@ -14,6 +14,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+/*
+ * Activité correspondant au menu principal
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     String URL = "https://dept-info.univ-fcomte.fr/joomla/images/CR0700/Quizzs.xml";
@@ -58,12 +62,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /* Méthode qui appelle la classe Donwload */
     public void download() {
 
         int testDatabaseAnimal=0;
         int testDatabaseInfo=0;
         int testDatabaseCulture=0;
 
+        // On vérifie si les quizz du fichier XML sont déjà présents dans la base
         try {
             testDatabaseAnimal = database.getQuizzId("Monde Animal");
             testDatabaseInfo = database.getQuizzId("Informatique");
@@ -72,12 +78,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // On vérifie si l'utilisateur est connecté à internet
         if (isNetworkAvailable()) {
+            // Si les quizz du fichier XML ne sont pas présent
             if (testDatabaseAnimal == 0 && testDatabaseCulture == 0 && testDatabaseInfo == 0) {
                 DownloadXML xml = (DownloadXML) new DownloadXML().execute(URL);
                 try {
+                    // On appelle la fonction execute() de Download par la méthode get qui lance un thread
                     quizzsList = xml.get();
                     Toast.makeText(MainActivity.this, "Le téléchargement à réussi !", Toast.LENGTH_SHORT).show();
+                    // On insere les quizz dans la base de données
                     insereBDD(quizzsList);
                 } catch (InterruptedException | ExecutionException e) {
                     Toast.makeText(MainActivity.this, "Le téléchargement à échoué !", Toast.LENGTH_SHORT).show();
@@ -92,8 +102,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /* Méthode qui parcourt l'arrylist pour remplir la base de données */
     public void insereBDD(ArrayList<Quizz> quizzsList) {
 
+        // On récuprère les identifiants des prochains élements dans la base
         int id_quizz = database.getNextId("quizz");
         int id_question = database.getNextId("question");
         int id_reponse = database.getNextId("proposition");
@@ -145,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    /* Méthode qui vérifie si le réseau est disponible */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

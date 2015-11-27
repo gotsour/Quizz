@@ -15,6 +15,10 @@ import android.widget.ImageButton;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Activité qui permet l'ajout d'une question
+ * avec des propositions sous forme d'image
+ */
 
 public class AddImageQuestionActivity extends Activity {
 
@@ -69,6 +73,7 @@ public class AddImageQuestionActivity extends Activity {
 
     }
 
+    /* Méthode qui récupère le résultat de l'image envoyée par la gallerie */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -86,9 +91,11 @@ public class AddImageQuestionActivity extends Activity {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
 
+            // En fonction de la méthode et donc de l'image sur laquelle on a appuyé
             switch (requestCode) {
                 case PICK_IMAGE_1:
                     picturePath1 = picturePath;
+                    // On insère l'image dans le button
                     image1.setImageBitmap(BitmapFactory.decodeFile(picturePath));
                     break;
                 case PICK_IMAGE_2:
@@ -110,6 +117,7 @@ public class AddImageQuestionActivity extends Activity {
 
     }
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 1 */
     View.OnClickListener chercheImage1 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -120,6 +128,7 @@ public class AddImageQuestionActivity extends Activity {
         }
     };
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 2 */
     View.OnClickListener chercheImage2 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -130,6 +139,7 @@ public class AddImageQuestionActivity extends Activity {
         }
     };
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 3 */
     View.OnClickListener chercheImage3 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -140,6 +150,7 @@ public class AddImageQuestionActivity extends Activity {
         }
     };
 
+    /* Méthode qui permet d'appeler la gallerie pour l'image 4 */
     View.OnClickListener chercheImage4 = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -150,11 +161,14 @@ public class AddImageQuestionActivity extends Activity {
         }
     };
 
+    /* Méthode qui permet d'ajouter la question */
     View.OnClickListener ajouterQuestion = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
+            // Récupérations du next id pour la question
             int nextQuestionId = questionDB.getNextId("question");
+            // Création de la question dans la base avec ou pas son indice de réponse associé
             if (!questionTexte.getText().toString().equals("")) {
                 if (!reponseTexte.getText().toString().equals("")) {
                     questionDB.creerQuestion(nextQuestionId, questionTexte.getText().toString(), quizzNumber, Integer.parseInt(reponseTexte.getText().toString()));
@@ -163,10 +177,12 @@ public class AddImageQuestionActivity extends Activity {
                 }
             }
 
+            // Récupération du next id pour les propositions
             int nextPropositionId = questionDB.getNextId("proposition");
             // On vérifie pour chaque ImageButton si une image a été sélectionnée
             if (image1.getDrawable() != null) {
                 if (picturePath1 != null) {
+                    // On créer notre proposition dans la base
                     questionDB.creerProposition(nextPropositionId, picturePath1, nextQuestionId);
                     nextPropositionId++;
                 }
@@ -189,9 +205,11 @@ public class AddImageQuestionActivity extends Activity {
                 }
             }
 
+            // On retourne à l'activité qui affiche les questions d'un quizz
             Intent intent = new Intent(AddImageQuestionActivity.this, ShowQuestionsActivity.class);
             intent.putExtra("quizzNumber", quizzNumber);
             startActivity(intent);
+            // On termine notre activité
             finish();
         }
     };

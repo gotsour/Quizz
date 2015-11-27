@@ -14,6 +14,11 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+/*
+ * Classe qui permet de télécharger le fichier XML sur le serveur
+ * et de parser les quizz
+ */
+
 class DownloadXML extends AsyncTask<String, Void, ArrayList<Quizz>> {
 
     NodeList racine;
@@ -50,7 +55,7 @@ class DownloadXML extends AsyncTask<String, Void, ArrayList<Quizz>> {
 
                 Element quizzs = (Element) racineNoeuds.item(i);
 
-                    /* On creer un nouveau Quizz et on l'insere dans notre liste quizz */
+                /* On creer un nouveau Quizz et on l'insere dans notre liste quizz */
                 quizzsList.add(new Quizz(quizzs.getAttribute("type")));
 
                 NodeList questions = quizzs.getElementsByTagName("Question");
